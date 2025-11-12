@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
+import { CreationalPatternsModule } from './patterns/creational/creational-patterns.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { getDatabaseConfig } from './config/database.config';
         getDatabaseConfig(configService),
       inject: [ConfigService],
     }),
+    CreationalPatternsModule, // ← Nuevo módulo agregado
   ],
   controllers: [AppController],
   providers: [AppService],
