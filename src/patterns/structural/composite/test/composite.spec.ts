@@ -7,6 +7,7 @@ import { PrendaSimpleComponent } from '../components/prenda-simple.component.js'
 import { ConjuntoPrendasComponent } from '../components/conjunto-prendas.component.js';
 import { Prenda } from '../../../../modules/prendas/entities/prenda.entity.js';
 import { VestidoDama } from '../../../../modules/prendas/entities/vestido-dama.entity.js';
+import { Disfraz } from '../../../../modules/prendas/entities/disfraz.entity.js';
 
 describe('Composite Pattern', () => {
   let service: CompositeManagerService;
@@ -18,7 +19,7 @@ describe('Composite Pattern', () => {
     mockPrendaRepository = {
       findOne: jest.fn().mockImplementation(({ where }) => {
         const mockPrendas = {
-          VD001: {
+          VD001: Object.assign(new VestidoDama(), {
             id: 1,
             referencia: 'VD001',
             color: 'Blanco',
@@ -31,8 +32,8 @@ describe('Composite Pattern', () => {
             esLargo: true,
             cantidadPiezas: 3,
             descripcionPiezas: 'Vestido + velo + corona',
-          } as VestidoDama,
-          ACC001: {
+          }),
+          ACC001: Object.assign(new Disfraz(), {
             id: 2,
             referencia: 'ACC001',
             color: 'Blanco',
@@ -41,8 +42,10 @@ describe('Composite Pattern', () => {
             valorAlquiler: 50000,
             disponible: true,
             estado: 'disponible',
-          } as Prenda,
-          ZAP001: {
+            nombre: 'Accesorio ACC001',
+            categoria: 'accesorios',
+          }),
+          ZAP001: Object.assign(new Disfraz(), {
             id: 3,
             referencia: 'ZAP001',
             color: 'Blanco',
@@ -51,7 +54,9 @@ describe('Composite Pattern', () => {
             valorAlquiler: 80000,
             disponible: true,
             estado: 'disponible',
-          } as Prenda,
+            nombre: 'Zapato ZAP001',
+            categoria: 'calzado',
+          }),
         };
 
         return Promise.resolve(mockPrendas[where.referencia] || null);
@@ -78,7 +83,7 @@ describe('Composite Pattern', () => {
     let mockVestido: VestidoDama;
 
     beforeEach(() => {
-      mockVestido = {
+      mockVestido = Object.assign(new VestidoDama(), {
         id: 1,
         referencia: 'VD001',
         color: 'Blanco',
@@ -91,7 +96,7 @@ describe('Composite Pattern', () => {
         esLargo: true,
         cantidadPiezas: 3,
         descripcionPiezas: 'Vestido + velo + corona',
-      } as VestidoDama;
+      });
 
       prendaSimple = new PrendaSimpleComponent(mockVestido);
     });
@@ -150,22 +155,26 @@ describe('Composite Pattern', () => {
         'Conjunto de Prueba',
       );
 
-      const mockVestido = {
+      const mockVestido = Object.assign(new VestidoDama(), {
         id: 1,
         referencia: 'VD001',
         valorAlquiler: 300000,
         disponible: true,
         estado: 'disponible',
         cantidadPiezas: 3,
-      } as VestidoDama;
+        tienePedreria: false,
+        esLargo: false,
+      });
 
-      const mockAccesorio = {
+      const mockAccesorio = Object.assign(new Disfraz(), {
         id: 2,
         referencia: 'ACC001',
         valorAlquiler: 50000,
         disponible: true,
         estado: 'disponible',
-      } as Prenda;
+        nombre: 'Accesorio ACC001',
+        categoria: 'accesorios',
+      });
 
       prenda1 = new PrendaSimpleComponent(mockVestido);
       prenda2 = new PrendaSimpleComponent(mockAccesorio);

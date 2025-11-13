@@ -372,11 +372,20 @@ describe('Facade Pattern', () => {
 
       const mockQueryBuilder = {
         select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
         getRawOne: jest.fn().mockResolvedValue({ total: '1500000' }),
+        getRawMany: jest.fn().mockResolvedValue([]),
       };
       (mockServicioRepository.createQueryBuilder as jest.Mock).mockReturnValue(
         mockQueryBuilder,
       );
+
+      // Mock para prendas populares
+      (mockPrendaRepository.find as jest.Mock).mockResolvedValue([]);
 
       const resultado = await service.obtenerEstadisticasNegocio();
 
