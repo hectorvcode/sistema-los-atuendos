@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
 import { CreationalPatternsModule } from './patterns/creational/creational-patterns.module';
+import { PrendasModule } from './modules/prendas/prendas.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { CreationalPatternsModule } from './patterns/creational/creational-patte
         getDatabaseConfig(configService),
       inject: [ConfigService],
     }),
-    CreationalPatternsModule, // ← Nuevo módulo agregado
+    CreationalPatternsModule,
+    PrendasModule, // Módulo de gestión de prendas
   ],
   controllers: [AppController],
   providers: [AppService],
