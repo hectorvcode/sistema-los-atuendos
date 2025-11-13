@@ -1,29 +1,32 @@
+// src/patterns/structural/structural-patterns.module.ts
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Entidades
 import { Prenda } from '../../modules/prendas/entities/prenda.entity';
-import { VestidoDama } from '../../modules/prendas/entities/vestido-dama.entity';
-import { TrajeCaballero } from '../../modules/prendas/entities/traje-caballero.entity';
-import { Disfraz } from '../../modules/prendas/entities/disfraz.entity';
 
-// Composite Pattern
+// Composite Pattern (ya existente)
 import { CompositeManagerService } from './composite/services/composite-manager.service';
-import { ConjuntoBuilder } from './composite/builders/conjunto-builder';
+
+// Decorator Pattern (nuevo)
+import { DecoratorService } from './decorator/decorator.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Prenda, VestidoDama, TrajeCaballero, Disfraz]),
-  ],
+  imports: [TypeOrmModule.forFeature([Prenda])],
   providers: [
     // Composite Pattern
     CompositeManagerService,
-    ConjuntoBuilder,
+
+    // Decorator Pattern
+    DecoratorService,
   ],
   exports: [
     // Composite Pattern
     CompositeManagerService,
-    ConjuntoBuilder,
+
+    // Decorator Pattern
+    DecoratorService,
   ],
 })
 export class StructuralPatternsModule {}
