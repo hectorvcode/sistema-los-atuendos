@@ -90,6 +90,7 @@ ormconfig.json
 .cache/
 /cache/
 *.cache
+.claude/
 
 # Package managers
 .yarn/
