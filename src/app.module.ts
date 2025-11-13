@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
 import { CreationalPatternsModule } from './patterns/creational/creational-patterns.module';
 import { PrendasModule } from './modules/prendas/prendas.module';
+import { ClientesModule } from './modules/clientes/clientes.module';
+import { EmpleadosModule } from './modules/empleados/empleados.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { PrendasModule } from './modules/prendas/prendas.module';
     }),
     CreationalPatternsModule,
     PrendasModule, // Módulo de gestión de prendas
+    ClientesModule, // Módulo de gestión de clientes
+    EmpleadosModule, // Módulo de gestión de empleados
   ],
   controllers: [AppController],
   providers: [AppService],
