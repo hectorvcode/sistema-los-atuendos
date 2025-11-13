@@ -3,30 +3,22 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-// Entidades
+// Entidades (ajustar según tu estructura)
 import { Prenda } from '../../modules/prendas/entities/prenda.entity';
+import { Cliente } from '../../modules/clientes/entities/cliente.entity';
+import { Empleado } from '../../modules/empleados/entities/empleado.entity';
+import { ServicioAlquiler } from '../../modules/servicios/entities/servicio-alquiler.entity';
 
-// Composite Pattern (ya existente)
+// Servicios de patrones estructurales
 import { CompositeManagerService } from './composite/services/composite-manager.service';
-
-// Decorator Pattern (nuevo)
 import { DecoratorService } from './decorator/decorator.service';
+import { NegocioFacadeService } from './facade/services/negocio-facade.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Prenda])],
-  providers: [
-    // Composite Pattern
-    CompositeManagerService,
-
-    // Decorator Pattern
-    DecoratorService,
+  imports: [
+    TypeOrmModule.forFeature([Prenda, Cliente, Empleado, ServicioAlquiler]),
   ],
-  exports: [
-    // Composite Pattern
-    CompositeManagerService,
-
-    // Decorator Pattern
-    DecoratorService,
-  ],
+  providers: [CompositeManagerService, DecoratorService, NegocioFacadeService],
+  exports: [CompositeManagerService, DecoratorService, NegocioFacadeService],
 })
 export class StructuralPatternsModule {}
