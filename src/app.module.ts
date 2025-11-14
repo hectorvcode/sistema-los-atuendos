@@ -8,6 +8,7 @@ import { CreationalPatternsModule } from './patterns/creational/creational-patte
 import { PrendasModule } from './modules/prendas/prendas.module';
 import { ClientesModule } from './modules/clientes/clientes.module';
 import { EmpleadosModule } from './modules/empleados/empleados.module';
+import { ServiciosModule } from './modules/servicios/servicios.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { EmpleadosModule } from './modules/empleados/empleados.module';
     PrendasModule, // Módulo de gestión de prendas
     ClientesModule, // Módulo de gestión de clientes
     EmpleadosModule, // Módulo de gestión de empleados
+    ServiciosModule, // Módulo de servicios de alquiler (Builder + Singleton)
   ],
   controllers: [AppController],
   providers: [AppService],
