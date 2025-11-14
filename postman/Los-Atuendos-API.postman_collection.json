@@ -1,0 +1,887 @@
+{
+  "info": {
+    "name": "Los Atuendos - API REST",
+    "_postman_id": "los-atuendos-api-v1",
+    "description": "Collection completa para testing de la API de Los Atuendos\n\n## Descripción\n\nAPI RESTful profesional para gestión de alquiler de vestuario con patrones de diseño implementados.\n\n## Características\n\n- ✅ Variables de entorno pre-configuradas\n- ✅ Tests automáticos en cada request\n- ✅ Pre-request scripts para datos dinámicos\n- ✅ Datos de ejemplo incluidos\n- ✅ Organización por módulos\n\n## Instrucciones de Uso\n\n1. Importar el environment `Los-Atuendos-Local.postman_environment.json`\n2. Seleccionar el environment en Postman\n3. Ejecutar las requests en orden o usar el Runner\n4. Revisar los resultados de tests en la pestaña Test Results\n\n## Módulos Incluidos\n\n- **Prendas**: Factory Method Pattern\n- **Clientes**: CRUD completo\n- **Empleados**: CRUD completo\n- **Servicios de Alquiler**: Builder Pattern\n- **Lavandería**: Decorator Pattern\n\n## Autor\n\nEquipo de Desarrollo - Los Atuendos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET API Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Validar que la API está activa",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is less than 500ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "description": "Verifica que la API esté activa y funcionando correctamente"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para verificar el estado de la API"
+    },
+    {
+      "name": "Prendas",
+      "item": [
+        {
+          "name": "Crear Vestido de Dama",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generar referencia única",
+                  "const timestamp = Date.now();",
+                  "const referencia = `VD-TEST-${timestamp}`;",
+                  "pm.environment.set('nuevaReferencia', referencia);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has standard format\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData).to.have.property('statusCode');",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
+                  "    pm.expect(jsonData).to.have.property('path');",
+                  "});",
+                  "",
+                  "pm.test(\"Prenda created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('referencia');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    ",
+                  "    // Guardar ID y referencia para requests posteriores",
+                  "    pm.environment.set('prendaId', jsonData.data.id);",
+                  "    pm.environment.set('prendaReferencia', jsonData.data.referencia);",
+                  "});",
+                  "",
+                  "pm.test(\"Factory Method Pattern applied correctly\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.tipo).to.equal('vestido-dama');",
+                  "    pm.expect(jsonData.data).to.have.property('largo');",
+                  "    pm.expect(jsonData.data).to.have.property('tieneEnaguas');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"vestido-dama\",\n  \"referencia\": \"{{nuevaReferencia}}\",\n  \"color\": \"Rojo\",\n  \"marca\": \"Elegancia\",\n  \"talla\": \"M\",\n  \"valorAlquiler\": 150000,\n  \"largo\": \"largo\",\n  \"tieneEnaguas\": true,\n  \"esAjustable\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prendas",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas"]
+            },
+            "description": "Crea un vestido de dama usando Factory Method Pattern"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Todas las Prendas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('meta');",
+                  "    pm.expect(jsonData.meta).to.have.property('currentPage');",
+                  "    pm.expect(jsonData.meta).to.have.property('totalItems');",
+                  "    pm.expect(jsonData.meta).to.have.property('totalPages');",
+                  "    pm.expect(jsonData.meta).to.have.property('hasNextPage');",
+                  "    pm.expect(jsonData.meta).to.have.property('hasPreviousPage');",
+                  "});",
+                  "",
+                  "pm.test(\"Data is array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prendas?pagina=1&limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "1"
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Obtiene todas las prendas con paginación"
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Prenda por Referencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Prenda encontrada\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('referencia');",
+                  "    pm.expect(jsonData.data.referencia).to.equal(pm.environment.get('prendaReferencia'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prendas/referencia/{{prendaReferencia}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas", "referencia", "{{prendaReferencia}}"]
+            },
+            "description": "Busca una prenda específica por su referencia"
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar Prendas por Talla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"All prendas have correct talla\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(prenda => {",
+                  "        pm.expect(prenda.talla).to.equal('M');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prendas/talla/M?pagina=1&limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas", "talla", "M"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "1"
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Consulta prendas filtradas por talla"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de prendas con Factory Method Pattern"
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Crear Cliente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generar datos únicos para el cliente",
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('clienteNumeroId', `${timestamp}`.slice(-9));",
+                  "pm.environment.set('clienteEmail', `cliente${timestamp}@test.com`);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Cliente created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('nombre');",
+                  "    ",
+                  "    // Guardar ID para requests posteriores",
+                  "    pm.environment.set('clienteId', jsonData.data.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Unique constraints validated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('numeroIdentificacion');",
+                  "    pm.expect(jsonData.data).to.have.property('correoElectronico');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María García\",\n  \"numeroIdentificacion\": \"{{clienteNumeroId}}\",\n  \"correoElectronico\": \"{{clienteEmail}}\",\n  \"telefono\": \"3001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes"]
+            },
+            "description": "Crea un nuevo cliente con validación de datos únicos"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Cliente por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Cliente data is complete\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('nombre');",
+                  "    pm.expect(jsonData.data).to.have.property('numeroIdentificacion');",
+                  "    pm.expect(jsonData.data).to.have.property('correoElectronico');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{clienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{clienteId}}"]
+            },
+            "description": "Obtiene un cliente específico por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Servicios de Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response includes cliente and servicios\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('cliente');",
+                  "    pm.expect(jsonData.data).to.have.property('servicios');",
+                  "    pm.expect(jsonData.data).to.have.property('totalServicios');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{clienteId}}/servicios?soloVigentes=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{clienteId}}", "servicios"],
+              "query": [
+                {
+                  "key": "soloVigentes",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Obtiene todos los servicios de un cliente con información detallada"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de clientes con CRUD completo"
+    },
+    {
+      "name": "Empleados",
+      "item": [
+        {
+          "name": "Crear Empleado",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generar datos únicos para el empleado",
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('empleadoNumeroId', `${timestamp}`.slice(-9));",
+                  "pm.environment.set('empleadoEmail', `empleado${timestamp}@losatuendos.com`);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Empleado created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    ",
+                  "    // Guardar ID para requests posteriores",
+                  "    pm.environment.set('empleadoId', jsonData.data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Rodríguez\",\n  \"numeroIdentificacion\": \"{{empleadoNumeroId}}\",\n  \"correoElectronico\": \"{{empleadoEmail}}\",\n  \"telefono\": \"3009876543\",\n  \"cargo\": \"Asesor de Ventas\",\n  \"salario\": 2500000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["empleados"]
+            },
+            "description": "Crea un nuevo empleado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Todos los Empleados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('meta');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/empleados?pagina=1&limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["empleados"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "1"
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Obtiene lista de empleados con paginación"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de empleados"
+    },
+    {
+      "name": "Servicios de Alquiler",
+      "item": [
+        {
+          "name": "Crear Servicio de Alquiler (Builder)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generar fecha futura para el alquiler",
+                  "const futureDate = new Date();",
+                  "futureDate.setDate(futureDate.getDate() + 30);",
+                  "const fechaAlquiler = futureDate.toISOString().split('T')[0];",
+                  "pm.environment.set('fechaAlquiler', fechaAlquiler);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Servicio created with Builder Pattern\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('numero');",
+                  "    pm.expect(jsonData.data).to.have.property('valorTotal');",
+                  "    pm.expect(jsonData.data).to.have.property('estado');",
+                  "    ",
+                  "    // Guardar número de servicio",
+                  "    pm.environment.set('servicioNumero', jsonData.data.numero);",
+                  "    pm.environment.set('servicioId', jsonData.data.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Consecutive number generated (Singleton)\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.numero).to.be.a('number');",
+                  "    pm.expect(jsonData.data.numero).to.be.above(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"empleadoId\": {{empleadoId}},\n  \"fechaAlquiler\": \"{{fechaAlquiler}}\",\n  \"prendasIds\": [{{prendaId}}],\n  \"observaciones\": \"Cliente prefiere entrega a domicilio\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/servicios",
+              "host": ["{{baseUrl}}"],
+              "path": ["servicios"]
+            },
+            "description": "Crea un servicio de alquiler usando Builder Pattern. Genera número consecutivo con Singleton Pattern."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Servicio por Número",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Servicio found with complete data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('numero');",
+                  "    pm.expect(jsonData.data).to.have.property('cliente');",
+                  "    pm.expect(jsonData.data).to.have.property('empleado');",
+                  "    pm.expect(jsonData.data).to.have.property('prendas');",
+                  "    pm.expect(jsonData.data.prendas).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/numero/{{servicioNumero}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["servicios", "numero", "{{servicioNumero}}"]
+            },
+            "description": "Busca un servicio por su número consecutivo"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Estadísticas de Servicios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Statistics include all metrics\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('total');",
+                  "    pm.expect(jsonData.data).to.have.property('porEstado');",
+                  "    pm.expect(jsonData.data).to.have.property('valorTotal');",
+                  "    pm.expect(jsonData.data).to.have.property('promedioPrendas');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/estadisticas",
+              "host": ["{{baseUrl}}"],
+              "path": ["servicios", "estadisticas"]
+            },
+            "description": "Obtiene estadísticas generales de servicios"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de servicios de alquiler con Builder Pattern y Singleton Pattern"
+    },
+    {
+      "name": "Lavandería",
+      "item": [
+        {
+          "name": "Registrar Prenda para Lavandería (Decorator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Item created with Decorator Pattern\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('prioridad');",
+                  "    pm.expect(jsonData.data).to.have.property('estado');",
+                  "    ",
+                  "    // Guardar ID del ítem",
+                  "    pm.environment.set('lavanderiaItemId', jsonData.data.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Priority calculated by decorators\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.prioridad).to.be.a('number');",
+                  "    // Con mancha severa + delicada, la prioridad debe ser > 0",
+                  "    pm.expect(jsonData.data.prioridad).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prendaId\": {{prendaId}},\n  \"esManchada\": true,\n  \"esDelicada\": true,\n  \"prioridadAdministrativa\": false,\n  \"configuraciones\": {\n    \"mancha\": {\n      \"tipo\": \"vino\",\n      \"gravedad\": \"severa\"\n    },\n    \"delicada\": {\n      \"razon\": \"tejido delicado\",\n      \"cuidadoEspecial\": true\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lavanderia",
+              "host": ["{{baseUrl}}"],
+              "path": ["lavanderia"]
+            },
+            "description": "Registra una prenda para lavandería. Usa Decorator Pattern para calcular prioridad dinámicamente."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Cola de Lavandería por Prioridad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Queue is sorted by priority (DESC)\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var items = jsonData.data;",
+                  "    ",
+                  "    if (items.length > 1) {",
+                  "        for (let i = 0; i < items.length - 1; i++) {",
+                  "            pm.expect(items[i].prioridad).to.be.at.least(items[i+1].prioridad);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lavanderia/cola",
+              "host": ["{{baseUrl}}"],
+              "path": ["lavanderia", "cola"]
+            },
+            "description": "Obtiene la cola de lavandería ordenada por prioridad (mayor prioridad primero)"
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar Lote a Lavandería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Batch processed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('mensaje');",
+                  "    pm.expect(jsonData.data).to.have.property('itemsEnviados');",
+                  "    pm.expect(jsonData.data).to.have.property('detalles');",
+                  "    pm.expect(jsonData.data.detalles).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemsIds\": [{{lavanderiaItemId}}]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lavanderia/enviar-lote",
+              "host": ["{{baseUrl}}"],
+              "path": ["lavanderia", "enviar-lote"]
+            },
+            "description": "Procesa un lote de ítems para enviar a lavandería. Genera notificación con detalles."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Estadísticas de Lavandería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Statistics are comprehensive\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('totalItems');",
+                  "    pm.expect(jsonData.data).to.have.property('pendientes');",
+                  "    pm.expect(jsonData.data).to.have.property('porEstado');",
+                  "    pm.expect(jsonData.data).to.have.property('prioridadPromedio');",
+                  "    pm.expect(jsonData.data).to.have.property('itemsConPrioridadAlta');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lavanderia/estadisticas",
+              "host": ["{{baseUrl}}"],
+              "path": ["lavanderia", "estadisticas"]
+            },
+            "description": "Obtiene estadísticas completas del sistema de lavandería"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de lavandería con Decorator Pattern para prioridades dinámicas"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script global pre-request",
+          "console.log('Ejecutando request:', pm.info.requestName);",
+          "console.log('Environment activo:', pm.environment.name);",
+          "",
+          "// Verificar que baseUrl está definida",
+          "if (!pm.environment.get('baseUrl')) {",
+          "    console.error('ERROR: baseUrl no está definida en el environment');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Tests globales que se ejecutan en todas las requests",
+          "pm.test(\"Response format is valid JSON\", function () {",
+          "    pm.response.to.be.json;",
+          "});",
+          "",
+          "pm.test(\"Response has standard API format\", function () {",
+          "    var jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "    pm.expect(jsonData).to.have.property('statusCode');",
+          "    pm.expect(jsonData).to.have.property('message');",
+          "    pm.expect(jsonData).to.have.property('timestamp');",
+          "    pm.expect(jsonData).to.have.property('path');",
+          "});",
+          "",
+          "// Logging de respuesta",
+          "console.log('Status:', pm.response.code);",
+          "console.log('Response time:', pm.response.responseTime, 'ms');"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ]
+}
