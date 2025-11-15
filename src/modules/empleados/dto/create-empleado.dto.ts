@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsBoolean, IsOptional, IsDateString, IsNumber, MaxLength, MinLength, Min } from 'class-validator';
+import { IsString, IsEmail, IsBoolean, IsOptional, IsNumber, MaxLength, MinLength, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -64,8 +64,8 @@ export class CreateEmpleadoDto {
     description: 'Fecha de ingreso del empleado (formato ISO)',
     example: '2023-01-15',
   })
-  @IsDateString()
-  fechaIngreso: Date;
+  @IsString()
+  fechaIngreso: string;
 
   @ApiPropertyOptional({
     description: 'Salario mensual del empleado',

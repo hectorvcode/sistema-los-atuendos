@@ -1,7 +1,7 @@
 import { Column, ChildEntity } from 'typeorm';
 import { Prenda } from './prenda.entity';
 
-@ChildEntity()
+@ChildEntity('VestidoDama')
 export class VestidoDama extends Prenda {
   @Column({
     type: 'boolean',

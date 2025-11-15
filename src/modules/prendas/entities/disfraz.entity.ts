@@ -1,7 +1,7 @@
 import { Column, ChildEntity } from 'typeorm';
 import { Prenda } from './prenda.entity';
 
-@ChildEntity()
+@ChildEntity('Disfraz')
 export class Disfraz extends Prenda {
   @Column({
     type: 'varchar',

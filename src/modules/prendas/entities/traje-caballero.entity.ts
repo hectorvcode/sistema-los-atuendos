@@ -1,7 +1,7 @@
 import { Column, ChildEntity } from 'typeorm';
 import { Prenda } from './prenda.entity';
 
-@ChildEntity()
+@ChildEntity('TrajeCaballero')
 export class TrajeCaballero extends Prenda {
   @Column({
     type: 'enum',

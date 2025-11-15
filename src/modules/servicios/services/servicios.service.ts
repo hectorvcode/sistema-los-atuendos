@@ -5,7 +5,7 @@ import { ServicioAlquiler } from '../entities/servicio-alquiler.entity';
 import { CreateServicioAlquilerDto, UpdateServicioAlquilerDto, QueryServiciosDto } from '../dto';
 import { PaginationResult } from '../interfaces/servicio-repository.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Prenda } from '../../prendas/entities/prenda.entity';
 
 /**
@@ -68,7 +68,9 @@ export class ServiciosService {
    * Valida que las prendas existan y estén disponibles
    */
   private async validarDisponibilidadPrendas(prendasIds: number[]): Promise<void> {
-    const prendas = await this.prendaRepository.findByIds(prendasIds);
+    const prendas = await this.prendaRepository.find({
+      where: { id: In(prendasIds) },
+    });
 
     if (prendas.length !== prendasIds.length) {
       const prendasEncontradas = prendas.map(p => p.id);

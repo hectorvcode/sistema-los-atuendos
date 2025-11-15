@@ -38,6 +38,11 @@ export class EmpleadosService {
       const empleado = new Empleado();
       Object.assign(empleado, createEmpleadoDto);
 
+      // Convertir fechaIngreso de string a Date
+      if (createEmpleadoDto.fechaIngreso) {
+        empleado.fechaIngreso = new Date(createEmpleadoDto.fechaIngreso);
+      }
+
       return await this.empleadoRepository.crear(empleado);
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -128,7 +133,24 @@ export class EmpleadosService {
       }
     }
 
-    return await this.empleadoRepository.actualizar(id, updateEmpleadoDto);
+    // Convertir datos para actualización
+    const datosActualizacion: Partial<Empleado> = {
+      nombre: updateEmpleadoDto.nombre,
+      numeroIdentificacion: updateEmpleadoDto.numeroIdentificacion,
+      direccion: updateEmpleadoDto.direccion,
+      telefono: updateEmpleadoDto.telefono,
+      cargo: updateEmpleadoDto.cargo,
+      correoElectronico: updateEmpleadoDto.correoElectronico,
+      activo: updateEmpleadoDto.activo,
+      salario: updateEmpleadoDto.salario,
+    };
+
+    // Convertir fechaIngreso de string a Date si está presente
+    if (updateEmpleadoDto.fechaIngreso) {
+      datosActualizacion.fechaIngreso = new Date(updateEmpleadoDto.fechaIngreso);
+    }
+
+    return await this.empleadoRepository.actualizar(id, datosActualizacion);
   }
 
   async desactivarEmpleado(id: number): Promise<Empleado> {

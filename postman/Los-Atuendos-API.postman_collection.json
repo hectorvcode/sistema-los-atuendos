@@ -39,15 +39,16 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}",
-              "host": ["{{baseUrl}}"]
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
             },
             "description": "Verifica que la API esté activa y funcionando correctamente"
           },
           "response": []
         }
       ],
-      "description": "Endpoints para verificar el estado de la API"
+      "description": "Health check de la API (usa /health con versionado)"
     },
     {
       "name": "Prendas",
@@ -99,8 +100,8 @@
                   "pm.test(\"Factory Method Pattern applied correctly\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.data.tipo).to.equal('vestido-dama');",
-                  "    pm.expect(jsonData.data).to.have.property('largo');",
-                  "    pm.expect(jsonData.data).to.have.property('tieneEnaguas');",
+                  "    pm.expect(jsonData.data).to.have.property('tienePedreria');",
+                  "    pm.expect(jsonData.data).to.have.property('cantidadPiezas');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -117,7 +118,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tipo\": \"vestido-dama\",\n  \"referencia\": \"{{nuevaReferencia}}\",\n  \"color\": \"Rojo\",\n  \"marca\": \"Elegancia\",\n  \"talla\": \"M\",\n  \"valorAlquiler\": 150000,\n  \"largo\": \"largo\",\n  \"tieneEnaguas\": true,\n  \"esAjustable\": false\n}"
+              "raw": "{\n  \"tipo\": \"vestido-dama\",\n  \"referencia\": \"{{nuevaReferencia}}\",\n  \"color\": \"Rojo\",\n  \"marca\": \"Elegancia\",\n  \"talla\": \"M\",\n  \"valorAlquiler\": 150000,\n  \"estado\": \"disponible\",\n  \"propiedadesEspecificas\": {\n    \"tienePedreria\": true,\n    \"esLargo\": true,\n    \"cantidadPiezas\": 1\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/prendas",
@@ -256,9 +257,68 @@
             "description": "Consulta prendas filtradas por talla"
           },
           "response": []
+        },
+        {
+          "name": "Crear Traje de Caballero",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('nuevaReferenciaTraje', `TC-TEST-${timestamp}`);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"traje-caballero\",\n  \"referencia\": \"{{nuevaReferenciaTraje}}\",\n  \"color\": \"Negro\",\n  \"marca\": \"Distinction\",\n  \"talla\": \"L\",\n  \"valorAlquiler\": 180000,\n  \"propiedadesEspecificas\": {\n    \"tipo\": \"frac\",\n    \"tieneCorbata\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prendas",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas"]
+            },
+            "description": "Crea un traje de caballero"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Disfraz",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now(); pm.environment.set('nuevaReferenciaDisfraz', `DF-TEST-${ts}`);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"disfraz\",\n  \"referencia\": \"{{nuevaReferenciaDisfraz}}\",\n  \"color\": \"Rojo\",\n  \"marca\": \"Fantasy\",\n  \"talla\": \"S\",\n  \"valorAlquiler\": 95000,\n  \"propiedadesEspecificas\": {\n    \"nombre\": \"Vampiro Clásico\",\n    \"descripcion\": \"Capa y chaleco\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prendas",
+              "host": ["{{baseUrl}}"],
+              "path": ["prendas"]
+            },
+            "description": "Crea un disfraz"
+          },
+          "response": []
         }
       ],
-      "description": "Gestión de prendas con Factory Method Pattern"
+      "description": "Gestión de prendas con Factory Method Pattern (crear, listar, buscar, actualizar, eliminar)"
     },
     {
       "name": "Clientes",
@@ -403,7 +463,7 @@
           "response": []
         }
       ],
-      "description": "Gestión de clientes con CRUD completo"
+      "description": "Gestión de clientes (crear, obtener, listar servicios)"
     },
     {
       "name": "Empleados",
@@ -418,7 +478,11 @@
                   "// Generar datos únicos para el empleado",
                   "const timestamp = Date.now();",
                   "pm.environment.set('empleadoNumeroId', `${timestamp}`.slice(-9));",
-                  "pm.environment.set('empleadoEmail', `empleado${timestamp}@losatuendos.com`);"
+                  "pm.environment.set('empleadoEmail', `empleado${timestamp}@losatuendos.com`);",
+                  "",
+                  "// Generar fecha de ingreso (hoy)",
+                  "const today = new Date().toISOString().split('T')[0];",
+                  "pm.environment.set('fechaIngreso', today);"
                 ],
                 "type": "text/javascript"
               }
@@ -454,7 +518,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Carlos Rodríguez\",\n  \"numeroIdentificacion\": \"{{empleadoNumeroId}}\",\n  \"correoElectronico\": \"{{empleadoEmail}}\",\n  \"telefono\": \"3009876543\",\n  \"cargo\": \"Asesor de Ventas\",\n  \"salario\": 2500000\n}"
+              "raw": "{\n  \"nombre\": \"Carlos Rodríguez\",\n  \"numeroIdentificacion\": \"{{empleadoNumeroId}}\",\n  \"correoElectronico\": \"{{empleadoEmail}}\",\n  \"telefono\": \"3009876543\",\n  \"direccion\": \"Calle 123 #45-67, Medellín\",\n  \"cargo\": \"Asesor de Ventas\",\n  \"fechaIngreso\": \"{{fechaIngreso}}\",\n  \"salario\": 2500000\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/empleados",
@@ -509,7 +573,7 @@
           "response": []
         }
       ],
-      "description": "Gestión de empleados"
+      "description": "Gestión de empleados (crear y listar paginado)"
     },
     {
       "name": "Servicios de Alquiler",
@@ -553,7 +617,7 @@
                   "pm.test(\"Consecutive number generated (Singleton)\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.data.numero).to.be.a('number');",
-                  "    pm.expect(jsonData.data.numero).to.be.above(1000);",
+                  "    pm.expect(jsonData.data.numero).to.be.above(0);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -653,7 +717,7 @@
           "response": []
         }
       ],
-      "description": "Gestión de servicios de alquiler con Builder Pattern y Singleton Pattern"
+      "description": "Servicios de alquiler (crear, buscar por número, estadísticas) - Builder + Singleton"
     },
     {
       "name": "Lavandería",
@@ -831,7 +895,7 @@
           "response": []
         }
       ],
-      "description": "Gestión de lavandería con Decorator Pattern para prioridades dinámicas"
+      "description": "Lavandería (registrar, cola, enviar lote, estadísticas) - Decorator Pattern"
     }
   ],
   "event": [

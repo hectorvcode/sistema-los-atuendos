@@ -27,15 +27,27 @@ async function cleanDatabase() {
 
     console.log('🧹 Limpiando todas las tablas...');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
-    await dataSource.query('TRUNCATE TABLE servicios_prendas');
-    await dataSource.query('TRUNCATE TABLE items_lavanderia');
-    await dataSource.query('TRUNCATE TABLE servicios_alquiler');
-    await dataSource.query('TRUNCATE TABLE consecutivos');
-    await dataSource.query('TRUNCATE TABLE prendas');
-    await dataSource.query('TRUNCATE TABLE clientes');
-    await dataSource.query('TRUNCATE TABLE empleados');
+
+    // Usar DELETE en lugar de TRUNCATE para evitar problemas con foreign keys
+    await dataSource.query('DELETE FROM servicios_prendas');
+    await dataSource.query('DELETE FROM items_lavanderia');
+    await dataSource.query('DELETE FROM servicios_alquiler');
+    await dataSource.query('DELETE FROM consecutivos');
+    await dataSource.query('DELETE FROM prendas');
+    await dataSource.query('DELETE FROM clientes');
+    await dataSource.query('DELETE FROM empleados');
+
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log('✅ Todas las tablas han sido limpiadas\n');
+
+    console.log('🔄 Reseteando autoincrementos...');
+    await dataSource.query('ALTER TABLE prendas AUTO_INCREMENT = 1');
+    await dataSource.query('ALTER TABLE clientes AUTO_INCREMENT = 1');
+    await dataSource.query('ALTER TABLE empleados AUTO_INCREMENT = 1');
+    await dataSource.query('ALTER TABLE servicios_alquiler AUTO_INCREMENT = 1');
+    await dataSource.query('ALTER TABLE items_lavanderia AUTO_INCREMENT = 1');
+    await dataSource.query('ALTER TABLE consecutivos AUTO_INCREMENT = 1');
+    console.log('✅ Autoincrementos reseteados correctamente\n');
 
     console.log('╔═══════════════════════════════════════════════════╗');
     console.log('║                                                   ║');

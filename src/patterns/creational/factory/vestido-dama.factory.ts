@@ -37,7 +37,8 @@ export class VestidoDamaFactory extends AbstractPrendaFactory<VestidoDama> {
       throw new Error(`La referencia ${datos.referencia} ya existe`);
     }
 
-    // Crear instancia del vestido
+    // Crear instancia del vestido usando el método create del repository
+    // TypeORM maneja automáticamente el discriminador 'tipo' basado en @ChildEntity('VestidoDama')
     const vestido = this.repository.create({
       referencia: datos.referencia,
       color: datos.color,
@@ -52,10 +53,17 @@ export class VestidoDamaFactory extends AbstractPrendaFactory<VestidoDama> {
       estado: 'disponible',
     });
 
-    // Guardar en base de datos
+    // Guardar usando save() que maneja correctamente la herencia
     const vestidoGuardado = await this.repository.save(vestido);
 
-    console.log(`✅ Vestido de dama creado: ${vestidoGuardado.referencia}`);
+    if (!vestidoGuardado) {
+      throw new Error('Error al guardar el vestido');
+    }
+
+    (vestidoGuardado as any).tipo = 'vestido-dama';
+    console.log(
+      `✅ Vestido de dama creado: ${vestidoGuardado.referencia} (ID: ${vestidoGuardado.id})`,
+    );
     return vestidoGuardado;
   }
 

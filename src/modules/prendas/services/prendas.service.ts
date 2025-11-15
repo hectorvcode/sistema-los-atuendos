@@ -51,23 +51,30 @@ export class PrendasService {
         ...createPrendaDto.propiedadesEspecificas,
       };
 
-      // Usar Factory Method para crear la prenda según su tipo
+      // Usar Factory Method para crear la prenda según su tipo (ya persiste)
       const prenda = await this.prendaFactory.crearPrenda(
         createPrendaDto.tipo,
         datosBase
       );
 
-      // Establecer propiedades adicionales si están presentes
-      if (createPrendaDto.estado) {
+      // Establecer propiedades adicionales si están presentes y guardar cambios si aplican
+      let necesitaGuardar = false;
+      if (createPrendaDto.estado && prenda.estado !== createPrendaDto.estado) {
         prenda.estado = createPrendaDto.estado;
+        necesitaGuardar = true;
       }
 
-      if (createPrendaDto.disponible !== undefined) {
+      if (createPrendaDto.disponible !== undefined && prenda.disponible !== createPrendaDto.disponible) {
         prenda.disponible = createPrendaDto.disponible;
+        necesitaGuardar = true;
       }
 
-      // Usar Repository (Adapter) para persistir
-      return await this.prendaRepository.guardar(prenda);
+      if (necesitaGuardar) {
+        await this.prendaRepository.guardar(prenda); // update
+      }
+
+      // Evitar doble inserción (factory ya hizo save)
+      return prenda;
     } catch (error) {
       if (error instanceof BadRequestException || error instanceof ConflictException) {
         throw error;
