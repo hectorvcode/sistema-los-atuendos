@@ -32,7 +32,7 @@ API RESTful profesional para la gestión integral de un sistema de alquiler de v
 
 ### Tecnologías
 
-- **Framework**: NestJS 10.x
+- **Framework**: NestJS 11.0.1
 - **ORM**: TypeORM
 - **Base de Datos**: MySQL
 - **Validación**: class-validator

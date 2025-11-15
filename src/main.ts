@@ -159,7 +159,7 @@ Los endpoints que retornan listas incluyen paginación:
 \`\`\`
 
 ## Tecnologías
-- **Framework**: NestJS 10.x
+- **Framework**: NestJS 11.0.1
 - **ORM**: TypeORM
 - **Database**: MySQL
 - **Validation**: class-validator
@@ -230,9 +230,15 @@ Los endpoints que retornan listas incluyen paginación:
   console.log('║           🎭  LOS ATUENDOS - API REST  🎭                ║');
   console.log('║                                                          ║');
   console.log('╠══════════════════════════════════════════════════════════╣');
-  console.log(`║  🚀 Servidor:     http://localhost:${port.toString().padEnd(26)}║`);
-  console.log(`║  📚 Documentación: http://localhost:${port}/api/docs${' '.repeat(13)}║`);
-  console.log(`║  🌍 Entorno:      ${(process.env.NODE_ENV || 'development').padEnd(37)}║`);
+  console.log(
+    `║  🚀 Servidor:     http://localhost:${port.toString().padEnd(26)}║`,
+  );
+  console.log(
+    `║  📚 Documentación: http://localhost:${port}/api/docs${' '.repeat(13)}║`,
+  );
+  console.log(
+    `║  🌍 Entorno:      ${(process.env.NODE_ENV || 'development').padEnd(37)}║`,
+  );
   console.log('║  ✅ Estado:       Activo                                 ║');
   console.log('║                                                          ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');

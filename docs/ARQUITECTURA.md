@@ -25,12 +25,12 @@ Los Atuendos es un sistema de gestión para el alquiler de vestuario (vestidos d
 
 ### Tecnologías Principales
 
-- **Framework Backend**: NestJS 10.x
-- **Lenguaje**: TypeScript 5.x
-- **ORM**: TypeORM 0.3.x
+- **Framework Backend**: NestJS 11.0.1
+- **Lenguaje**: TypeScript 5.7.3
+- **ORM**: TypeORM 0.3.27
 - **Base de Datos**: MySQL 8.x
 - **Documentación API**: Swagger/OpenAPI 3.0
-- **Testing**: Jest 30.x
+- **Testing**: Jest 30.x + Supertest 7.x
 - **Validación**: class-validator + class-transformer
 
 ### Principios de Diseño

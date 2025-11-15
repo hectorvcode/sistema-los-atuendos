@@ -245,10 +245,10 @@ Este proyecto es parte de un trabajo académico para la materia de Patrones de D
 
 ## Tecnologías Utilizadas
 
-- **Framework:** NestJS 10.x
-- **ORM:** TypeORM 0.3.x
+- **Framework:** NestJS 11.0.1
+- **ORM:** TypeORM 0.3.27
 - **Base de Datos:** MySQL 8.x
-- **Lenguaje:** TypeScript 5.x
+- **Lenguaje:** TypeScript 5.7.3
 - **Documentación API:** Swagger/OpenAPI 3.0
-- **Testing:** Jest + Supertest
+- **Testing:** Jest 30.x + Supertest 7.x
 - **Validación:** class-validator + class-transformer
