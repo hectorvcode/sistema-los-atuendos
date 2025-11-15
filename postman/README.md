@@ -124,7 +124,7 @@ Request: Obtener Cola de Lavandería por Prioridad
 ### Opción B: Ejecución Automática (Prueba Rápida)
 
 1. Haga clic derecho en la colección **"Los Atuendos - API REST"**
-2. Seleccione **"Run collection"**
+2. Seleccione **"Run"**
 3. Configure:
    - **Iterations:** 1
    - **Delay:** 500ms (opcional)
@@ -278,10 +278,6 @@ Para explorar la API interactivamente:
 
 Total: 20 requests con tests automáticos
 ```
-
----
-
-## Contacto
 
 Si tiene problemas durante la evaluación, verifique:
 
