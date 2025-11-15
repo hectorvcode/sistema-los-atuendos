@@ -66,7 +66,7 @@ Crear archivo `.env` en la raíz del proyecto:
 DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=root
-DB_PASSWORD=tu_password_aqui
+DB_PASSWORD=
 DB_NAME=los_atuendos
 
 # Application Configuration
@@ -98,8 +98,6 @@ Esto carga:
 - 5 Empleados
 - 8 Clientes
 - 20 Prendas (8 vestidos, 6 trajes, 6 disfraces)
-- 5 Servicios de alquiler
-- 6 Items de lavandería
 
 ## Documentación de la API
 
@@ -109,24 +107,7 @@ Una vez iniciada la aplicación, acceder a:
 
 ## Pruebas con Postman
 
-### Importar Colección de Postman
-
-1. Abrir Postman
-2. Clic en **Import**
-3. Seleccionar los archivos:
-   - `postman/Los-Atuendos-API.postman_collection.json`
-   - `postman/Los-Atuendos-Local.postman_environment.json`
-4. Seleccionar el environment **"Los Atuendos - Local"**
-
-### Ejecutar Pruebas
-
-Ver instrucciones detalladas en: [postman/README.md](postman/README.md)
-
-**Ejecución rápida:**
-
-- Clic derecho en la colección → **"Run"**
-- Configurar iterations: 1
-- Clic en **"Run Los Atuendos - API REST"**
+Para ejecutar las pruebas, ver instrucciones detalladas en: [postman/README.md](postman/README.md)
 
 ## Scripts Disponibles
 
