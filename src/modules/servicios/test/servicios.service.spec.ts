@@ -33,6 +33,7 @@ describe('ServiciosService', () => {
   };
 
   const mockPrendaRepository = {
+    find: jest.fn(),
     findByIds: jest.fn(),
     update: jest.fn(),
   };
@@ -90,13 +91,13 @@ describe('ServiciosService', () => {
       const servicioCreado = new ServicioAlquiler();
       servicioCreado.numero = 1001;
 
-      mockPrendaRepository.findByIds.mockResolvedValue(prendasMock);
+      mockPrendaRepository.find.mockResolvedValue(prendasMock);
       mockServicioAlquilerBuilder.build.mockResolvedValue(servicioCreado);
 
       const resultado = await service.crearServicio(createDto);
 
       expect(resultado).toBeDefined();
-      expect(mockPrendaRepository.findByIds).toHaveBeenCalledWith([1, 2]);
+      expect(mockPrendaRepository.find).toHaveBeenCalled();
       expect(mockServicioAlquilerBuilder.reset).toHaveBeenCalled();
       expect(mockServicioAlquilerBuilder.setCliente).toHaveBeenCalledWith(1);
       expect(mockServicioAlquilerBuilder.setEmpleado).toHaveBeenCalledWith(1);

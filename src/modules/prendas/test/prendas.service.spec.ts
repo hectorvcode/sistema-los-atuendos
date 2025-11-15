@@ -101,7 +101,8 @@ describe('PrendasService', () => {
           cantidadPiezas: 2,
         })
       );
-      expect(mockPrendaRepository.guardar).toHaveBeenCalledWith(prendaCreada);
+      // No se llama a guardar porque el factory ya persiste la prenda
+      expect(mockPrendaRepository.guardar).not.toHaveBeenCalled();
     });
 
     it('debería lanzar BadRequestException si el tipo de prenda es inválido', async () => {

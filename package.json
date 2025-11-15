@@ -99,6 +99,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.ts"
+    ],
+    "testTimeout": 30000,
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     }

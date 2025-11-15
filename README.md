@@ -224,7 +224,9 @@ npm run db:reset
 
 ## 📖 Documentación Adicional
 
+- [Arquitectura del Sistema](docs/ARQUITECTURA.md) - Diseño, patrones y decisiones arquitectónicas
 - [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas de API
+- [Documentación de Testing](docs/TESTING.md) - Tests unitarios y patrones de diseño
 - [Documentación de API REST](docs/API-REST.md) - Endpoints y ejemplos
 
 ## Contribuir
