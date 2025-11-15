@@ -215,9 +215,8 @@ npm run start:dev
 # Los tests E2E crean sus propios datos
 npm run test:e2e
 
-# Después de tests, limpiar datos de prueba (opcional)
-mysql -u root -p los_atuendos
-> CALL sp_limpiar_datos_prueba();
+# Después de tests, resetear la base de datos (opcional)
+npm run db:reset
 ```
 
 ### Demostración
@@ -360,16 +359,16 @@ npm run seed:custom
    - Decorator: Prioridades calculadas según características
 
 5. **Limpieza**:
-   - Usar procedimientos SQL para limpiar antes de re-ejecutar
-   - O truncar manualmente: `CALL sp_limpiar_todas_tablas();`
+   - Usar el comando de reset: `npm run db:reset`
+   - Este comando limpia todas las tablas y recarga el seed completo
 
 ---
 
 ## 🔗 Ver También
 
-- [SQL Scripts README](../../../sql/README.md) - Scripts SQL y procedimientos
 - [Testing Documentation](../../../docs/TESTING.md) - Documentación de tests
 - [API Documentation](../../../docs/API-REST.md) - Documentación de la API
+- [Postman Guide](../../../postman/README.md) - Guía de pruebas con Postman
 
 ---
 

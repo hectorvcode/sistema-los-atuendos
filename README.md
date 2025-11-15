@@ -1,98 +1,274 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Los Atuendos - Sistema de Alquiler de Vestuario
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (vestidos, trajes y disfraces), implementando patrones de diseño de software.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Características Principales
 
-## Description
+- **Patrones de Diseño Implementados:**
+  - Factory Method (creación de prendas)
+  - Builder (servicios de alquiler)
+  - Singleton (generación de consecutivos)
+  - Decorator (cálculo dinámico de prioridades)
+  - Repository (persistencia de datos)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Módulos:**
+  - Gestión de Prendas (vestidos, trajes, disfraces)
+  - Gestión de Clientes
+  - Gestión de Empleados
+  - Servicios de Alquiler
+  - Sistema de Lavandería
 
-## Project setup
+## Requisitos Previos
 
-```bash
-$ npm install
-```
+- Node.js (v18 o superior)
+- MySQL (v8 o superior)
+- npm o yarn
+- Postman (para pruebas de API)
 
-## Compile and run the project
+## Instalación y Configuración
+
+### 1. Clonar el Repositorio
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone <url-del-repositorio>
+cd los-atuendos
 ```
 
-## Run tests
+### 2. Instalar Dependencias
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+### 3. Configurar Base de Datos
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+#### Opción A: Desde MySQL Workbench o phpMyAdmin
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Abrir MySQL Workbench o phpMyAdmin (XAMPP)
+2. Crear nueva base de datos:
+
+```sql
+CREATE DATABASE los_atuendos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+#### Opción B: Desde Línea de Comandos
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+mysql -u root -p -e "CREATE DATABASE los_atuendos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Configurar Variables de Entorno
 
-## Resources
+Crear archivo `.env` en la raíz del proyecto:
 
-Check out a few resources that may come in handy when working with NestJS:
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=tu_password_aqui
+DB_NAME=los_atuendos
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Application Configuration
+APP_PORT=3000
+NODE_ENV=development
 
-## Support
+# Logging Level
+LOG_LEVEL=debug
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 5. Iniciar la Aplicación
 
-## Stay in touch
+```bash
+npm run start:dev
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+La aplicación iniciará en `http://localhost:3000`
 
-## License
+TypeORM creará automáticamente todas las tablas necesarias.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 6. Cargar Datos de Prueba
+
+```bash
+npm run seed:complete
+```
+
+Esto carga:
+
+- 5 Empleados
+- 8 Clientes
+- 20 Prendas (8 vestidos, 6 trajes, 6 disfraces)
+- 5 Servicios de alquiler
+- 6 Items de lavandería
+
+## Documentación de la API
+
+Una vez iniciada la aplicación, acceder a:
+
+**Swagger UI:** `http://localhost:3000/api/docs`
+
+## Pruebas con Postman
+
+### Importar Colección de Postman
+
+1. Abrir Postman
+2. Clic en **Import**
+3. Seleccionar los archivos:
+   - `postman/Los-Atuendos-API.postman_collection.json`
+   - `postman/Los-Atuendos-Local.postman_environment.json`
+4. Seleccionar el environment **"Los Atuendos - Local"**
+
+### Ejecutar Pruebas
+
+Ver instrucciones detalladas en: [postman/README.md](postman/README.md)
+
+**Ejecución rápida:**
+
+- Clic derecho en la colección → **"Run"**
+- Configurar iterations: 1
+- Clic en **"Run Los Atuendos - API REST"**
+
+## Scripts Disponibles
+
+```bash
+# Desarrollo
+npm run start:dev          # Iniciar en modo desarrollo con hot-reload
+
+# Producción
+npm run build              # Compilar para producción
+npm run start:prod         # Iniciar en modo producción
+
+# Base de Datos
+npm run seed:complete      # Cargar datos de prueba completos
+npm run db:reset           # Limpiar BD y recargar datos
+
+# Testing
+npm run test               # Ejecutar tests unitarios
+npm run test:e2e           # Ejecutar tests end-to-end
+npm run test:cov           # Generar reporte de cobertura
+
+# Linting
+npm run lint               # Ejecutar ESLint
+npm run format             # Formatear código con Prettier
+```
+
+## Estructura del Proyecto
+
+```
+los-atuendos/
+├── src/
+│   ├── common/              # Utilidades compartidas, filters, interceptors
+│   ├── database/            # Configuración DB, seeds, migrations
+│   ├── modules/             # Módulos de la aplicación
+│   │   ├── clientes/
+│   │   ├── empleados/
+│   │   ├── lavanderia/
+│   │   ├── prendas/
+│   │   └── servicios/
+│   ├── patterns/            # Implementación de patrones de diseño
+│   │   ├── creational/      # Factory, Builder, Singleton
+│   │   └── structural/      # Decorator, Repository
+│   ├── app.module.ts
+│   └── main.ts
+├── postman/                 # Colección de Postman y documentación
+├── test/                    # Tests E2E
+└── docs/                    # Documentación adicional
+```
+
+## Patrones de Diseño
+
+### Factory Method
+
+Ubicación: `src/patterns/creational/factory/`
+
+Crea diferentes tipos de prendas (vestidos, trajes, disfraces) mediante factories específicas.
+
+### Builder
+
+Ubicación: `src/patterns/creational/builder/`
+
+Construye servicios de alquiler complejos paso a paso.
+
+### Singleton
+
+Ubicación: `src/patterns/creational/singleton/`
+
+Generador único de números consecutivos para servicios.
+
+### Decorator
+
+Ubicación: `src/patterns/structural/decorator/`
+
+Calcula dinámicamente la prioridad de items de lavandería.
+
+### Repository
+
+Ubicación: `src/patterns/structural/repository/`
+
+Abstrae la lógica de acceso a datos.
+
+## Solución de Problemas
+
+### Error: "Cannot connect to database"
+
+**Solución:**
+
+1. Verificar que MySQL esté corriendo (XAMPP/MySQL Workbench)
+2. Verificar credenciales en `.env`
+3. Verificar que la base de datos `los_atuendos` existe
+
+### Error: "Port 3000 already in use"
+
+**Solución:**
+
+```bash
+# Windows
+taskkill /F /IM node.exe
+
+# Linux/Mac
+killall node
+```
+
+O cambiar el puerto en `.env`:
+
+```env
+APP_PORT=3001
+```
+
+### Error al cargar seeds
+
+**Solución:**
+
+```bash
+npm run db:reset
+```
+
+## 📖 Documentación Adicional
+
+- [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas
+- [Documentación de Testing](docs/TESTING.md) - Tests unitarios y E2E
+- [Documentación de API REST](docs/API-REST.md) - Endpoints y ejemplos
+
+## Contribuir
+
+1. Fork el proyecto
+2. Crear rama feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## Licencia
+
+Este proyecto es parte de un trabajo académico para la materia de Patrones de Diseño de Software.
+
+---
+
+## Tecnologías Utilizadas
+
+- **Framework:** NestJS 10.x
+- **ORM:** TypeORM 0.3.x
+- **Base de Datos:** MySQL 8.x
+- **Lenguaje:** TypeScript 5.x
+- **Documentación API:** Swagger/OpenAPI 3.0
+- **Testing:** Jest + Supertest
+- **Validación:** class-validator + class-transformer
