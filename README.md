@@ -125,7 +125,6 @@ npm run db:reset           # Limpiar BD y recargar datos
 
 # Testing
 npm run test               # Ejecutar tests unitarios
-npm run test:e2e           # Ejecutar tests end-to-end
 npm run test:cov           # Generar reporte de cobertura
 
 # Linting
@@ -152,7 +151,6 @@ los-atuendos/
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
-├── test/                    # Tests E2E
 └── docs/                    # Documentación adicional
 ```
 
@@ -226,8 +224,7 @@ npm run db:reset
 
 ## 📖 Documentación Adicional
 
-- [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas
-- [Documentación de Testing](docs/TESTING.md) - Tests unitarios y E2E
+- [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas de API
 - [Documentación de API REST](docs/API-REST.md) - Endpoints y ejemplos
 
 ## Contribuir

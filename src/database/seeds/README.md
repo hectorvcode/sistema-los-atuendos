@@ -212,10 +212,10 @@ npm run start:dev
 ### Testing
 
 ```bash
-# Los tests E2E crean sus propios datos
-npm run test:e2e
+# Los tests unitarios utilizan mocks
+npm run test:unit
 
-# Después de tests, resetear la base de datos (opcional)
+# Después de desarrollo, resetear la base de datos (opcional)
 npm run db:reset
 ```
 
