@@ -20,15 +20,15 @@ API RESTful profesional para la gestión integral de un sistema de alquiler de v
 
 ### Características Principales
 
-- ✅ **Arquitectura Hexagonal** con Repository Pattern
-- ✅ **Patrones de Diseño** (Factory, Builder, Singleton, Decorator, Adapter, Composite, Facade)
-- ✅ **Validación Automática** con class-validator
-- ✅ **Documentación Interactiva** con Swagger/OpenAPI 3.0
-- ✅ **Responses Estandarizados** con formato consistente
-- ✅ **Manejo Centralizado de Errores**
-- ✅ **Logging Automático** de peticiones
-- ✅ **CORS Configurado** para integración frontend
-- ✅ **Versionado de API** preparado para escalabilidad
+- **Arquitectura Hexagonal** con Repository Pattern
+- **Patrones de Diseño** (Factory, Builder, Singleton, Decorator, Adapter, Composite, Facade)
+- **Validación Automática** con class-validator
+- **Documentación Interactiva** con Swagger/OpenAPI 3.0
+- **Responses Estandarizados** con formato consistente
+- **Manejo Centralizado de Errores**
+- **Logging Automático** de peticiones
+- **CORS Configurado** para integración frontend
+- **Versionado de API** preparado para escalabilidad
 
 ### Tecnologías
 
@@ -83,14 +83,14 @@ CORS_ORIGIN=http://localhost:4200
 
 Todos los endpoints siguen las convenciones REST estándar:
 
-| Método HTTP | Acción | Ejemplo |
-|-------------|--------|---------|
-| `GET` | Obtener recursos | `GET /api/prendas` |
-| `GET` | Obtener recurso específico | `GET /api/prendas/:id` |
-| `POST` | Crear recurso | `POST /api/prendas` |
-| `PUT` | Actualizar recurso completo | `PUT /api/prendas/:id` |
-| `PATCH` | Actualizar parcialmente | `PATCH /api/servicios/:id/cancelar` |
-| `DELETE` | Eliminar recurso | `DELETE /api/prendas/:id` |
+| Método HTTP | Acción                      | Ejemplo                             |
+| ----------- | --------------------------- | ----------------------------------- |
+| `GET`       | Obtener recursos            | `GET /api/prendas`                  |
+| `GET`       | Obtener recurso específico  | `GET /api/prendas/:id`              |
+| `POST`      | Crear recurso               | `POST /api/prendas`                 |
+| `PUT`       | Actualizar recurso completo | `PUT /api/prendas/:id`              |
+| `PATCH`     | Actualizar parcialmente     | `PATCH /api/servicios/:id/cancelar` |
+| `DELETE`    | Eliminar recurso            | `DELETE /api/prendas/:id`           |
 
 ### Naming Conventions
 
@@ -103,7 +103,7 @@ Todos los endpoints siguen las convenciones REST estándar:
 
 ## Autenticación
 
-*Actualmente en desarrollo. La autenticación JWT será implementada en futuras versiones.*
+_Actualmente en desarrollo. La autenticación JWT será implementada en futuras versiones._
 
 ### Autenticación JWT (Próximamente)
 
@@ -112,10 +112,11 @@ Authorization: Bearer <token>
 ```
 
 Ejemplo:
+
 ```javascript
 const headers = {
-  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-  'Content-Type': 'application/json'
+  Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  'Content-Type': 'application/json',
 };
 ```
 
@@ -172,15 +173,15 @@ Todas las respuestas exitosas siguen este formato:
 
 ### Campos de Respuesta
 
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `success` | boolean | Indica si la operación fue exitosa |
-| `statusCode` | number | Código de estado HTTP |
-| `message` | string | Mensaje descriptivo de la operación |
-| `data` | any | Datos de la respuesta (opcional) |
-| `meta` | object | Metadatos adicionales (paginación, etc.) |
-| `timestamp` | string | Timestamp en formato ISO 8601 |
-| `path` | string | Ruta de la petición |
+| Campo        | Tipo    | Descripción                              |
+| ------------ | ------- | ---------------------------------------- |
+| `success`    | boolean | Indica si la operación fue exitosa       |
+| `statusCode` | number  | Código de estado HTTP                    |
+| `message`    | string  | Mensaje descriptivo de la operación      |
+| `data`       | any     | Datos de la respuesta (opcional)         |
+| `meta`       | object  | Metadatos adicionales (paginación, etc.) |
+| `timestamp`  | string  | Timestamp en formato ISO 8601            |
+| `path`       | string  | Ruta de la petición                      |
 
 ---
 
@@ -214,15 +215,15 @@ Todas las respuestas exitosas siguen este formato:
 
 ### Códigos de Error
 
-| Código | Significado | Cuándo ocurre |
-|--------|-------------|---------------|
-| `BAD_REQUEST` | Petición mal formada | Datos inválidos o incompletos |
-| `UNAUTHORIZED` | No autorizado | Token inválido o ausente |
-| `FORBIDDEN` | Prohibido | Sin permisos suficientes |
-| `NOT_FOUND` | No encontrado | Recurso no existe |
-| `CONFLICT` | Conflicto | Violación de unicidad |
-| `VALIDATION_ERROR` | Error de validación | Datos no cumplen reglas |
-| `INTERNAL_ERROR` | Error interno | Error del servidor |
+| Código             | Significado          | Cuándo ocurre                 |
+| ------------------ | -------------------- | ----------------------------- |
+| `BAD_REQUEST`      | Petición mal formada | Datos inválidos o incompletos |
+| `UNAUTHORIZED`     | No autorizado        | Token inválido o ausente      |
+| `FORBIDDEN`        | Prohibido            | Sin permisos suficientes      |
+| `NOT_FOUND`        | No encontrado        | Recurso no existe             |
+| `CONFLICT`         | Conflicto            | Violación de unicidad         |
+| `VALIDATION_ERROR` | Error de validación  | Datos no cumplen reglas       |
+| `INTERNAL_ERROR`   | Error interno        | Error del servidor            |
 
 ---
 
@@ -230,26 +231,26 @@ Todas las respuestas exitosas siguen este formato:
 
 ### Respuestas Exitosas (2xx)
 
-| Código | Significado | Uso |
-|--------|-------------|-----|
-| `200 OK` | Éxito | GET, PUT, PATCH exitosos |
-| `201 Created` | Creado | POST exitoso |
-| `204 No Content` | Sin contenido | DELETE exitoso |
+| Código           | Significado   | Uso                      |
+| ---------------- | ------------- | ------------------------ |
+| `200 OK`         | Éxito         | GET, PUT, PATCH exitosos |
+| `201 Created`    | Creado        | POST exitoso             |
+| `204 No Content` | Sin contenido | DELETE exitoso           |
 
 ### Errores del Cliente (4xx)
 
-| Código | Significado | Uso |
-|--------|-------------|-----|
-| `400 Bad Request` | Petición incorrecta | Datos inválidos |
-| `401 Unauthorized` | No autenticado | Sin token o token inválido |
-| `403 Forbidden` | Sin permisos | Usuario sin permisos |
-| `404 Not Found` | No encontrado | Recurso no existe |
-| `422 Unprocessable Entity` | No procesable | Error de validación |
+| Código                     | Significado         | Uso                        |
+| -------------------------- | ------------------- | -------------------------- |
+| `400 Bad Request`          | Petición incorrecta | Datos inválidos            |
+| `401 Unauthorized`         | No autenticado      | Sin token o token inválido |
+| `403 Forbidden`            | Sin permisos        | Usuario sin permisos       |
+| `404 Not Found`            | No encontrado       | Recurso no existe          |
+| `422 Unprocessable Entity` | No procesable       | Error de validación        |
 
 ### Errores del Servidor (5xx)
 
-| Código | Significado | Uso |
-|--------|-------------|-----|
+| Código                      | Significado   | Uso                 |
+| --------------------------- | ------------- | ------------------- |
 | `500 Internal Server Error` | Error interno | Error no controlado |
 
 ---
@@ -392,7 +393,9 @@ Content-Type: application/json
 
 ```javascript
 // 1. Buscar prendas disponibles
-const prendas = await fetch('http://localhost:3000/api/prendas?estado=disponible');
+const prendas = await fetch(
+  'http://localhost:3000/api/prendas?estado=disponible',
+);
 
 // 2. Crear servicio de alquiler
 const servicio = await fetch('http://localhost:3000/api/servicios', {
@@ -402,13 +405,15 @@ const servicio = await fetch('http://localhost:3000/api/servicios', {
     clienteId: 1,
     empleadoId: 1,
     fechaAlquiler: '2025-02-15',
-    prendasIds: [1, 2, 3]
-  })
+    prendasIds: [1, 2, 3],
+  }),
 });
 
 // 3. Consultar servicio creado
 const numero = servicio.data.numero;
-const detalles = await fetch(`http://localhost:3000/api/servicios/numero/${numero}`);
+const detalles = await fetch(
+  `http://localhost:3000/api/servicios/numero/${numero}`,
+);
 ```
 
 ### Ejemplo 2: Gestión de Lavandería con Prioridades
@@ -422,9 +427,9 @@ await fetch('http://localhost:3000/api/lavanderia', {
     prendaId: 1,
     esManchada: true,
     configuraciones: {
-      mancha: { tipo: 'vino', gravedad: 'severa' }
-    }
-  })
+      mancha: { tipo: 'vino', gravedad: 'severa' },
+    },
+  }),
 });
 
 // 2. Obtener cola ordenada por prioridad
@@ -435,8 +440,8 @@ await fetch('http://localhost:3000/api/lavanderia/enviar-lote', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    itemsIds: [1, 2, 3]
-  })
+    itemsIds: [1, 2, 3],
+  }),
 });
 ```
 
@@ -444,7 +449,9 @@ await fetch('http://localhost:3000/api/lavanderia/enviar-lote', {
 
 ```javascript
 // Obtener página 2 con 20 elementos
-const respuesta = await fetch('http://localhost:3000/api/prendas?pagina=2&limite=20');
+const respuesta = await fetch(
+  'http://localhost:3000/api/prendas?pagina=2&limite=20',
+);
 
 const { data, meta } = respuesta;
 console.log(`Mostrando ${data.length} de ${meta.totalItems} elementos`);
@@ -453,7 +460,9 @@ console.log(`Página ${meta.currentPage} de ${meta.totalPages}`);
 // Navegar a siguiente página
 if (meta.hasNextPage) {
   const siguientePagina = meta.currentPage + 1;
-  const siguiente = await fetch(`http://localhost:3000/api/prendas?pagina=${siguientePagina}`);
+  const siguiente = await fetch(
+    `http://localhost:3000/api/prendas?pagina=${siguientePagina}`,
+  );
 }
 ```
 
@@ -505,6 +514,7 @@ curl http://localhost:3000/api/prendas/referencia/VD-TEST-001
 ### Para Desarrolladores Frontend
 
 1. **Usar el formato estandarizado**:
+
    ```typescript
    interface ApiResponse<T> {
      success: boolean;
@@ -518,6 +528,7 @@ curl http://localhost:3000/api/prendas/referencia/VD-TEST-001
    ```
 
 2. **Manejar errores consistentemente**:
+
    ```typescript
    try {
      const response = await apiClient.post('/prendas', data);
@@ -527,13 +538,14 @@ curl http://localhost:3000/api/prendas/referencia/VD-TEST-001
      }
    } catch (error) {
      // error.errors contiene array de errores de validación
-     error.errors?.forEach(err => {
+     error.errors?.forEach((err) => {
        console.error(`${err.field}: ${err.message}`);
      });
    }
    ```
 
 3. **Implementar paginación**:
+
    ```typescript
    const { data, meta } = response;
 
@@ -546,6 +558,7 @@ curl http://localhost:3000/api/prendas/referencia/VD-TEST-001
 ### Para Desarrolladores Backend
 
 1. **Usar DTOs con validación**:
+
    ```typescript
    export class CreatePrendaDto {
      @IsString()

@@ -236,9 +236,9 @@ export class PrendaRepository implements IPersistenciaAdapter<Prenda> {
 
 **Beneficios**:
 
-- ✅ Fácil adición de nuevos tipos de prendas
-- ✅ Separación de lógica de creación
-- ✅ Cumple con Open/Closed Principle
+- Fácil adición de nuevos tipos de prendas
+- Separación de lógica de creación
+- Cumple con Open/Closed Principle
 
 **Ejemplo de Uso**:
 
@@ -287,9 +287,9 @@ const vestido = await factory.crearPrenda(datos);
 
 **Beneficios**:
 
-- ✅ Construcción clara y legible
-- ✅ Validación granular
-- ✅ Reutilizable
+- Construcción clara y legible
+- Validación granular
+- Reutilizable
 
 **Ejemplo de Uso**:
 
@@ -336,9 +336,9 @@ const servicio = await this.builder
 
 **Beneficios**:
 
-- ✅ Números únicos garantizados
-- ✅ Centralización de lógica
-- ✅ Previene duplicados
+- Números únicos garantizados
+- Centralización de lógica
+- Previene duplicados
 
 **Ejemplo de Uso**:
 
@@ -386,9 +386,9 @@ const numeroServicio = await generador.generar('SERVICIO');
 
 **Beneficios**:
 
-- ✅ Independencia de la implementación de BD
-- ✅ Fácil cambio de sistema de persistencia
-- ✅ Testeable con mocks
+- Independencia de la implementación de BD
+- Fácil cambio de sistema de persistencia
+- Testeable con mocks
 
 **Ejemplo de Uso**:
 
@@ -442,9 +442,9 @@ export class PrendaRepository extends AdaptadorBDRelacional<Prenda> {
 
 **Beneficios**:
 
-- ✅ Cálculo dinámico de prioridad
-- ✅ Fácil adición de nuevos criterios
-- ✅ Combinación de múltiples decorators
+- Cálculo dinámico de prioridad
+- Fácil adición de nuevos criterios
+- Combinación de múltiples decorators
 
 **Ejemplo de Uso**:
 
@@ -496,9 +496,9 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 
 **Beneficios**:
 
-- ✅ Trata prendas individuales y conjuntos uniformemente
-- ✅ Facilita cálculos recursivos
-- ✅ Extensible para nuevos tipos
+- Trata prendas individuales y conjuntos uniformemente
+- Facilita cálculos recursivos
+- Extensible para nuevos tipos
 
 #### 7. Facade Pattern
 
@@ -529,9 +529,9 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 
 **Beneficios**:
 
-- ✅ Interface simplificada
-- ✅ Reduce acoplamiento del cliente
-- ✅ Coordina múltiples servicios
+- Interface simplificada
+- Reduce acoplamiento del cliente
+- Coordina múltiples servicios
 
 #### 8. Repository Pattern
 
@@ -564,9 +564,9 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 
 **Beneficios**:
 
-- ✅ Separación de lógica de negocio y acceso a datos
-- ✅ Facilita testing con mocks
-- ✅ Centraliza queries complejas
+- Separación de lógica de negocio y acceso a datos
+- Facilita testing con mocks
+- Centraliza queries complejas
 
 ---
 
@@ -969,8 +969,8 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 
 La arquitectura de Los Atuendos está diseñada siguiendo principios SOLID y patrones de diseño reconocidos de la industria. El sistema es:
 
-- ✅ **Mantenible**: Código limpio y bien organizado
-- ✅ **Escalable**: Preparado para crecimiento
-- ✅ **Testeable**: Amplia cobertura de tests
-- ✅ **Extensible**: Fácil adición de nuevas funcionalidades
-- ✅ **Documentado**: Documentación completa y actualizada
+- **Mantenible**: Código limpio y bien organizado
+- **Escalable**: Preparado para crecimiento
+- **Testeable**: Amplia cobertura de tests
+- **Extensible**: Fácil adición de nuevas funcionalidades
+- **Documentado**: Documentación completa y actualizada

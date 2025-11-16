@@ -1,6 +1,6 @@
 # Documentación de Testing - Los Atuendos
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
 1. [Introducción](#introducción)
 2. [Estrategia de Testing](#estrategia-de-testing)
@@ -19,10 +19,10 @@ Este documento describe la estrategia de testing implementada en el proyecto Los
 
 ### Objetivos del Testing
 
-- ✅ Validar la correcta implementación de patrones de diseño
-- ✅ Asegurar la integridad de los datos y reglas de negocio
-- ✅ Facilitar refactorización segura del código
-- ✅ Documentar el comportamiento esperado del sistema
+- Validar la correcta implementación de patrones de diseño
+- Asegurar la integridad de los datos y reglas de negocio
+- Facilitar refactorización segura del código
+- Documentar el comportamiento esperado del sistema
 
 ---
 
@@ -36,13 +36,13 @@ Este documento describe la estrategia de testing implementada en el proyecto Los
 
 **Cobertura**:
 
-- ✅ Factory Method Pattern (Creación de prendas)
-- ✅ Builder Pattern (Construcción de servicios)
-- ✅ Singleton Pattern (Generación de consecutivos)
-- ✅ Decorator Pattern (Cálculo de prioridades)
-- ✅ Adapter Pattern (Abstracción de repositorios)
-- ✅ Composite Pattern (Gestión de conjuntos)
-- ✅ Facade Pattern (Simplificación de operaciones)
+- Factory Method Pattern (Creación de prendas)
+- Builder Pattern (Construcción de servicios)
+- Singleton Pattern (Generación de consecutivos)
+- Decorator Pattern (Cálculo de prioridades)
+- Adapter Pattern (Abstracción de repositorios)
+- Composite Pattern (Gestión de conjuntos)
+- Facade Pattern (Simplificación de operaciones)
 
 ---
 
@@ -107,10 +107,10 @@ npm run test:factory
 
 **Valida**:
 
-- ✅ Creación correcta de diferentes tipos de prendas
-- ✅ Validación de datos antes de crear
-- ✅ Registry de factories funciona correctamente
-- ✅ Manejo de errores para tipos inválidos
+- Creación correcta de diferentes tipos de prendas
+- Validación de datos antes de crear
+- Registry de factories funciona correctamente
+- Manejo de errores para tipos inválidos
 
 **Ejemplo de Test**:
 
@@ -142,10 +142,10 @@ npm run test:builder
 
 **Valida**:
 
-- ✅ Construcción paso a paso de servicios complejos
-- ✅ Validación de campos requeridos
-- ✅ Validación de reglas de negocio (fechas, disponibilidad)
-- ✅ Reset del builder después de build
+- Construcción paso a paso de servicios complejos
+- Validación de campos requeridos
+- Validación de reglas de negocio (fechas, disponibilidad)
+- Reset del builder después de build
 
 **Ejemplo de Test**:
 
@@ -167,10 +167,10 @@ npm run test:singleton
 
 **Valida**:
 
-- ✅ Solo existe una instancia del generador
-- ✅ Números consecutivos son únicos
-- ✅ Thread-safety en generación concurrente
-- ✅ Persistencia de consecutivos en base de datos
+- Solo existe una instancia del generador
+- Números consecutivos son únicos
+- Thread-safety en generación concurrente
+- Persistencia de consecutivos en base de datos
 
 #### Decorator Pattern
 
@@ -180,10 +180,10 @@ npm run test:decorator
 
 **Valida**:
 
-- ✅ Cálculo dinámico de prioridades
-- ✅ Aplicación correcta de múltiples decorators
-- ✅ Prioridad base + incrementos por características
-- ✅ Mancha, delicada y urgente modifican prioridad
+- Cálculo dinámico de prioridades
+- Aplicación correcta de múltiples decorators
+- Prioridad base + incrementos por características
+- Mancha, delicada y urgente modifican prioridad
 
 ---
 
