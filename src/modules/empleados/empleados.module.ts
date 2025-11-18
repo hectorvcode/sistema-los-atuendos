@@ -11,20 +11,9 @@ import { ServicioAlquiler } from '../servicios/entities/servicio-alquiler.entity
  * Implementa CRUD completo y consulta de servicios por empleado
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Empleado,
-      ServicioAlquiler,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Empleado, ServicioAlquiler])],
   controllers: [EmpleadosController],
-  providers: [
-    EmpleadosService,
-    EmpleadoRepository,
-  ],
-  exports: [
-    EmpleadosService,
-    EmpleadoRepository,
-  ],
+  providers: [EmpleadosService, EmpleadoRepository],
+  exports: [EmpleadosService, EmpleadoRepository],
 })
 export class EmpleadosModule {}

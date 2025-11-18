@@ -42,7 +42,9 @@ export interface ILavanderiaRepository {
   /**
    * Busca ítems con filtros y paginación
    */
-  buscarConFiltros(opciones: QueryLavanderiaOptions): Promise<PaginationResult<ItemLavanderia>>;
+  buscarConFiltros(
+    opciones: QueryLavanderiaOptions,
+  ): Promise<PaginationResult<ItemLavanderia>>;
 
   /**
    * Busca todos los ítems pendientes ordenados por prioridad
@@ -52,17 +54,27 @@ export interface ILavanderiaRepository {
   /**
    * Busca ítems por estado
    */
-  buscarPorEstado(estado: string, pagina?: number, limite?: number): Promise<PaginationResult<ItemLavanderia>>;
+  buscarPorEstado(
+    estado: string,
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<ItemLavanderia>>;
 
   /**
    * Actualiza un ítem de lavandería
    */
-  actualizar(id: number, datos: Partial<ItemLavanderia>): Promise<ItemLavanderia>;
+  actualizar(
+    id: number,
+    datos: Partial<ItemLavanderia>,
+  ): Promise<ItemLavanderia>;
 
   /**
    * Actualiza múltiples ítems por sus IDs
    */
-  actualizarMultiples(ids: number[], datos: Partial<ItemLavanderia>): Promise<void>;
+  actualizarMultiples(
+    ids: number[],
+    datos: Partial<ItemLavanderia>,
+  ): Promise<void>;
 
   /**
    * Elimina un ítem de lavandería

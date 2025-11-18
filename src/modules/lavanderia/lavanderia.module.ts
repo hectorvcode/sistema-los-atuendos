@@ -32,13 +32,7 @@ import { StructuralPatternsModule } from '../../patterns/structural/structural-p
     StructuralPatternsModule, // Para usar DecoratorService
   ],
   controllers: [LavanderiaController],
-  providers: [
-    LavanderiaService,
-    LavanderiaRepository,
-  ],
-  exports: [
-    LavanderiaService,
-    LavanderiaRepository,
-  ],
+  providers: [LavanderiaService, LavanderiaRepository],
+  exports: [LavanderiaService, LavanderiaRepository],
 })
 export class LavanderiaModule {}

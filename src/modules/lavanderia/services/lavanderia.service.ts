@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ItemLavanderia } from '../entities/item-lavanderia.entity';
@@ -30,7 +34,9 @@ export class LavanderiaService {
   /**
    * Registra una prenda para lavandería con cálculo de prioridad usando Decorator
    */
-  async registrarItem(createItemDto: CreateItemLavanderiaDto): Promise<ItemLavanderia> {
+  async registrarItem(
+    createItemDto: CreateItemLavanderiaDto,
+  ): Promise<ItemLavanderia> {
     try {
       // Validar que la prenda exista
       const prenda = await this.prendaRepository.findOne({
@@ -38,14 +44,17 @@ export class LavanderiaService {
       });
 
       if (!prenda) {
-        throw new BadRequestException(`Prenda con ID ${createItemDto.prendaId} no encontrada`);
+        throw new BadRequestException(
+          `Prenda con ID ${createItemDto.prendaId} no encontrada`,
+        );
       }
 
       // Usar el servicio Decorator para calcular prioridad
-      const prendaConPrioridad = await this.decoratorService.procesarSolicitudLavanderia({
-        referenciaPrenda: prenda.referencia,
-        configuraciones: createItemDto.configuraciones,
-      });
+      const prendaConPrioridad =
+        await this.decoratorService.procesarSolicitudLavanderia({
+          referenciaPrenda: prenda.referencia,
+          configuraciones: createItemDto.configuraciones,
+        });
 
       // Crear el ítem de lavandería con los datos calculados
       const item = new ItemLavanderia();
@@ -54,14 +63,17 @@ export class LavanderiaService {
       item.estado = 'pendiente';
       item.esManchada = createItemDto.esManchada || false;
       item.esDelicada = createItemDto.esDelicada || false;
-      item.prioridadAdministrativa = createItemDto.prioridadAdministrativa || false;
+      item.prioridadAdministrativa =
+        createItemDto.prioridadAdministrativa || false;
 
       return await this.lavanderiaRepository.crear(item);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new BadRequestException(`Error al registrar ítem para lavandería: ${error.message}`);
+      throw new BadRequestException(
+        `Error al registrar ítem para lavandería: ${error.message}`,
+      );
     }
   }
 
@@ -75,7 +87,9 @@ export class LavanderiaService {
   /**
    * Busca ítems con filtros y paginación
    */
-  async buscarItems(query: QueryLavanderiaDto): Promise<PaginationResult<ItemLavanderia>> {
+  async buscarItems(
+    query: QueryLavanderiaDto,
+  ): Promise<PaginationResult<ItemLavanderia>> {
     const opciones = {
       estado: query.estado,
       prioridadMinima: query.prioridadMinima,
@@ -96,7 +110,9 @@ export class LavanderiaService {
     const item = await this.lavanderiaRepository.buscarPorId(id);
 
     if (!item) {
-      throw new NotFoundException(`Ítem de lavandería con ID ${id} no encontrado`);
+      throw new NotFoundException(
+        `Ítem de lavandería con ID ${id} no encontrado`,
+      );
     }
 
     return item;
@@ -105,7 +121,10 @@ export class LavanderiaService {
   /**
    * Actualiza el estado de un ítem
    */
-  async actualizarItem(id: number, updateDto: UpdateItemLavanderiaDto): Promise<ItemLavanderia> {
+  async actualizarItem(
+    id: number,
+    updateDto: UpdateItemLavanderiaDto,
+  ): Promise<ItemLavanderia> {
     await this.buscarPorId(id); // Verificar que existe
 
     return await this.lavanderiaRepository.actualizar(id, {
@@ -129,28 +148,30 @@ export class LavanderiaService {
     try {
       // Validar que todos los ítems existan y estén pendientes
       const items = await Promise.all(
-        enviarLoteDto.itemsIds.map(id => this.buscarPorId(id))
+        enviarLoteDto.itemsIds.map((id) => this.buscarPorId(id)),
       );
 
-      const itemsNoPendientes = items.filter(item => item.estado !== 'pendiente');
+      const itemsNoPendientes = items.filter(
+        (item) => item.estado !== 'pendiente',
+      );
 
       if (itemsNoPendientes.length > 0) {
-        const ids = itemsNoPendientes.map(item => item.id).join(', ');
+        const ids = itemsNoPendientes.map((item) => item.id).join(', ');
         throw new BadRequestException(
-          `Los siguientes ítems no están en estado pendiente: ${ids}`
+          `Los siguientes ítems no están en estado pendiente: ${ids}`,
         );
       }
 
       // Actualizar estado a 'enviado'
       await this.lavanderiaRepository.actualizarMultiples(
         enviarLoteDto.itemsIds,
-        { estado: 'enviado' }
+        { estado: 'enviado' },
       );
 
       // Generar detalles de notificación ordenados por prioridad
       const detalles = items
         .sort((a, b) => b.prioridad - a.prioridad)
-        .map(item => ({
+        .map((item) => ({
           id: item.id,
           prenda: `${item.prenda.constructor.name} - ${item.prenda.referencia}`,
           prioridad: item.prioridad,
@@ -162,10 +183,15 @@ export class LavanderiaService {
         detalles,
       };
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
         throw error;
       }
-      throw new BadRequestException(`Error al enviar lote a lavandería: ${error.message}`);
+      throw new BadRequestException(
+        `Error al enviar lote a lavandería: ${error.message}`,
+      );
     }
   }
 
@@ -190,8 +216,12 @@ export class LavanderiaService {
    * Obtiene estadísticas de lavandería
    */
   async obtenerEstadisticas() {
-    const todosPendientes = await this.lavanderiaRepository.buscarPendientesOrdenadosPorPrioridad();
-    const todosItems = await this.lavanderiaRepository.buscarConFiltros({ pagina: 1, limite: 10000 });
+    const todosPendientes =
+      await this.lavanderiaRepository.buscarPendientesOrdenadosPorPrioridad();
+    const todosItems = await this.lavanderiaRepository.buscarConFiltros({
+      pagina: 1,
+      limite: 10000,
+    });
 
     const estadisticas = {
       totalItems: todosItems.total,
@@ -202,17 +232,25 @@ export class LavanderiaService {
     };
 
     // Agrupar por estado
-    todosItems.data.forEach(item => {
-      estadisticas.porEstado[item.estado] = (estadisticas.porEstado[item.estado] || 0) + 1;
+    todosItems.data.forEach((item) => {
+      estadisticas.porEstado[item.estado] =
+        (estadisticas.porEstado[item.estado] || 0) + 1;
     });
 
     // Calcular prioridad promedio
-    const totalPrioridad = todosItems.data.reduce((sum, item) => sum + item.prioridad, 0);
+    const totalPrioridad = todosItems.data.reduce(
+      (sum, item) => sum + item.prioridad,
+      0,
+    );
     estadisticas.prioridadPromedio =
-      todosItems.total > 0 ? Math.round((totalPrioridad / todosItems.total) * 100) / 100 : 0;
+      todosItems.total > 0
+        ? Math.round((totalPrioridad / todosItems.total) * 100) / 100
+        : 0;
 
     // Contar ítems con prioridad alta
-    estadisticas.itemsConPrioridadAlta = todosItems.data.filter(item => item.prioridad >= 10).length;
+    estadisticas.itemsConPrioridadAlta = todosItems.data.filter(
+      (item) => item.prioridad >= 10,
+    ).length;
 
     return estadisticas;
   }

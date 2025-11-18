@@ -568,6 +568,99 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 - Facilita testing con mocks
 - Centraliza queries complejas
 
+### Patrones de Comportamiento
+
+#### 9. State Pattern
+
+**Ubicación**: `src/patterns/behavioral/state/`
+
+**Propósito**: Gestionar el ciclo de vida de los servicios de alquiler mediante estados bien definidos, permitiendo que el objeto cambie su comportamiento cuando cambia su estado interno.
+
+**Implementación**:
+
+```
+                    FLUJO DE ESTADOS
+
+┌─────────────┐
+│  PENDIENTE  │ ◄─── Estado inicial
+└──────┬──────┘
+       │
+       ├──── confirmar() ────► CONFIRMADO
+       │                           │
+       │                           ├──── entregar() ────► ENTREGADO
+       │                           │                           │
+       │                           │                           │
+       │                           └──── cancelar() ──┐        │
+       │                                              │        │
+       └──── cancelar() ─────────────────────────────┼────────┘
+                                                      │        │
+                                                      ▼        │
+                                                 CANCELADO     │
+                                                 (terminal)    │
+                                                               ▼
+                                                          devolver()
+                                                               │
+                                                               ▼
+                                                           DEVUELTO
+                                                          (terminal)
+```
+
+**Componentes**:
+
+- `IServicioState`: Interfaz común para todos los estados
+- `AbstractServicioState`: Clase base con comportamiento por defecto
+- `PendingState`: Estado Pendiente (puede confirmar o cancelar)
+- `ConfirmedState`: Estado Confirmado (puede entregar o cancelar)
+- `DeliveredState`: Estado Entregado (solo puede devolver)
+- `ReturnedState`: Estado Devuelto (terminal - servicio completado)
+- `CancelledState`: Estado Cancelado (terminal - servicio cancelado)
+- `ServicioStateContext`: Gestor que coordina las transiciones
+
+**Matriz de Transiciones**:
+
+| Estado Actual | Confirmar | Entregar | Devolver | Cancelar | Modificar | Eliminar |
+|---------------|-----------|----------|----------|----------|-----------|----------|
+| Pendiente     | ✅        | ❌       | ❌       | ✅       | ✅        | ✅       |
+| Confirmado    | ❌        | ✅*      | ❌       | ✅       | ✅        | ❌       |
+| Entregado     | ❌        | ❌       | ✅       | ❌       | ❌        | ❌       |
+| Devuelto      | ❌        | ❌       | ❌       | ❌       | ❌        | ❌       |
+| Cancelado     | ❌        | ❌       | ❌       | ❌       | ❌        | ✅       |
+
+*Con validación: máximo 7 días de anticipación
+
+**Reglas de Negocio por Estado**:
+
+1. **Pendiente**: Puede confirmar o cancelar sin penalización. Se puede modificar y eliminar.
+2. **Confirmado**: Solo puede entregarse con máximo 7 días de anticipación. Cancelación con menos de 2 días puede tener penalización.
+3. **Entregado**: Solo puede registrarse la devolución. Calcula automáticamente días de retraso.
+4. **Devuelto** (Terminal): Estado completado exitosamente. Dispara envío automático a lavandería.
+5. **Cancelado** (Terminal): Estado de cancelación. Libera prendas inmediatamente.
+
+**Beneficios**:
+
+- Eliminación de condicionales dispersos
+- Validación automática de transiciones
+- Extensibilidad mediante nuevos estados
+- Cada estado encapsula su comportamiento
+- Testabilidad independiente por estado
+- Cumple SOLID Principles
+
+**Ejemplo de Uso**:
+
+```typescript
+// Validación automática de transiciones
+await stateContext.confirmar(servicio); // pendiente → confirmado
+
+// Consultar información del estado
+const info = stateContext.obtenerInformacionEstado(servicio);
+// {
+//   estadoActual: "confirmado",
+//   puedeModificar: true,
+//   puedeEliminar: false,
+//   transicionesPermitidas: ["entregado", "cancelado"]
+// }
+```
+
 ---
 
 ## Módulos del Sistema
@@ -637,11 +730,19 @@ const prioridad = item.calcularPrioridad(); // 105 si tiene todos
 - **Entity**: `ServicioAlquiler`
 - **Builder**: `ServicioAlquilerBuilder`
 - **Singleton**: `GeneradorConsecutivo`
+- **State Pattern**: Gestión del ciclo de vida
 
 **Funcionalidades**:
 
 - Creación de servicios (Builder Pattern)
 - Generación de números consecutivos (Singleton)
+- Gestión de estados del servicio (State Pattern):
+  - Confirmar servicio (pendiente → confirmado)
+  - Entregar al cliente (confirmado → entregado)
+  - Registrar devolución (entregado → devuelto)
+  - Cancelar servicio (→ cancelado)
+  - Validaciones automáticas de transiciones
+  - Consultar estado y transiciones permitidas
 - Cálculo de valor total
 - Control de fechas y disponibilidad
 - Estadísticas de servicios

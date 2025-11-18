@@ -84,11 +84,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Extrae errores de validación de class-validator
    */
-  private extractValidationErrors(exceptionResponse: string | object): Array<{
-    field?: string;
-    message: string;
-    constraint?: string;
-  }> | undefined {
+  private extractValidationErrors(exceptionResponse: string | object):
+    | Array<{
+        field?: string;
+        message: string;
+        constraint?: string;
+      }>
+    | undefined {
     if (typeof exceptionResponse === 'object') {
       const resp = exceptionResponse as any;
 
@@ -98,7 +100,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (typeof resp.message[0] === 'object') {
           return resp.message.map((err: any) => ({
             field: err.property || err.field,
-            message: Object.values(err.constraints || {}).join(', ') || err.message,
+            message:
+              Object.values(err.constraints || {}).join(', ') || err.message,
             constraint: err.constraint,
           }));
         }

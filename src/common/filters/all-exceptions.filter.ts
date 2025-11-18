@@ -39,16 +39,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       stack = exception.stack;
     }
     // Si es un objeto con statusCode (error de validación de class-validator)
-    else if (typeof exception === 'object' && exception !== null && 'statusCode' in exception) {
+    else if (
+      typeof exception === 'object' &&
+      exception !== null &&
+      'statusCode' in exception
+    ) {
       const exceptionObj = exception as any;
       status = exceptionObj.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       message = exceptionObj.message || message;
 
       // Si hay errores de validación, formatearlos
       if (exceptionObj.errors && Array.isArray(exceptionObj.errors)) {
-        const errorMessages = exceptionObj.errors.map((err: any) =>
-          `${err.field}: ${err.message}`
-        ).join(', ');
+        const errorMessages = exceptionObj.errors
+          .map((err: any) => `${err.field}: ${err.message}`)
+          .join(', ');
         message = `Error de validación: ${errorMessages}`;
       }
     }

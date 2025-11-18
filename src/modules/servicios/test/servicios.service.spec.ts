@@ -101,7 +101,9 @@ describe('ServiciosService', () => {
       expect(mockServicioAlquilerBuilder.reset).toHaveBeenCalled();
       expect(mockServicioAlquilerBuilder.setCliente).toHaveBeenCalledWith(1);
       expect(mockServicioAlquilerBuilder.setEmpleado).toHaveBeenCalledWith(1);
-      expect(mockServicioAlquilerBuilder.agregarPrendas).toHaveBeenCalledWith([1, 2]);
+      expect(mockServicioAlquilerBuilder.agregarPrendas).toHaveBeenCalledWith([
+        1, 2,
+      ]);
       expect(mockServicioAlquilerBuilder.build).toHaveBeenCalled();
     });
 
@@ -113,7 +115,9 @@ describe('ServiciosService', () => {
         prendasIds: [1],
       };
 
-      await expect(service.crearServicio(createDto)).rejects.toThrow(BadRequestException);
+      await expect(service.crearServicio(createDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('debería lanzar BadRequestException si las prendas no están disponibles', async () => {
@@ -125,12 +129,19 @@ describe('ServiciosService', () => {
       };
 
       const prendasMock = [
-        { id: 1, disponible: false, estado: 'alquilada', referencia: 'VD-001' } as Prenda,
+        {
+          id: 1,
+          disponible: false,
+          estado: 'alquilada',
+          referencia: 'VD-001',
+        } as Prenda,
       ];
 
       mockPrendaRepository.findByIds.mockResolvedValue(prendasMock);
 
-      await expect(service.crearServicio(createDto)).rejects.toThrow(BadRequestException);
+      await expect(service.crearServicio(createDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -150,7 +161,9 @@ describe('ServiciosService', () => {
     it('debería lanzar NotFoundException si el servicio no existe', async () => {
       mockServicioRepository.buscarPorNumero.mockResolvedValue(null);
 
-      await expect(service.buscarPorNumero(9999)).rejects.toThrow(NotFoundException);
+      await expect(service.buscarPorNumero(9999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -159,10 +172,7 @@ describe('ServiciosService', () => {
       const servicio = new ServicioAlquiler();
       servicio.id = 1;
       servicio.estado = 'confirmado';
-      servicio.prendas = [
-        { id: 1 } as Prenda,
-        { id: 2 } as Prenda,
-      ];
+      servicio.prendas = [{ id: 1 } as Prenda, { id: 2 } as Prenda];
 
       mockServicioRepository.buscarPorId.mockResolvedValue(servicio);
       mockServicioRepository.actualizar.mockResolvedValue({
@@ -174,7 +184,9 @@ describe('ServiciosService', () => {
 
       expect(resultado.estado).toBe('cancelado');
       expect(mockPrendaRepository.update).toHaveBeenCalledTimes(2);
-      expect(mockServicioRepository.actualizar).toHaveBeenCalledWith(1, { estado: 'cancelado' });
+      expect(mockServicioRepository.actualizar).toHaveBeenCalledWith(1, {
+        estado: 'cancelado',
+      });
     });
   });
 });

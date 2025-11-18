@@ -38,7 +38,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nueva prenda',
-    description: 'Crea una nueva prenda utilizando el patrón Factory Method para validar y construir la prenda según su tipo',
+    description:
+      'Crea una nueva prenda utilizando el patrón Factory Method para validar y construir la prenda según su tipo',
   })
   @ApiResponse({
     status: 201,
@@ -67,7 +68,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar prendas',
-    description: 'Obtiene un listado de prendas con filtros opcionales por talla, tipo, estado, color. Incluye paginación y ordenamiento.',
+    description:
+      'Obtiene un listado de prendas con filtros opcionales por talla, tipo, estado, color. Incluye paginación y ordenamiento.',
   })
   @ApiResponse({
     status: 200,
@@ -87,7 +89,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar prendas por talla',
-    description: 'Obtiene todas las prendas de una talla específica con paginación',
+    description:
+      'Obtiene todas las prendas de una talla específica con paginación',
   })
   @ApiParam({
     name: 'talla',
@@ -129,7 +132,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar prendas por talla agrupadas por tipo',
-    description: 'Obtiene todas las prendas de una talla específica separadas y agrupadas por tipo de prenda',
+    description:
+      'Obtiene todas las prendas de una talla específica separadas y agrupadas por tipo de prenda',
   })
   @ApiParam({
     name: 'talla',
@@ -167,7 +171,9 @@ export class PrendasController {
     status: 404,
     description: 'Prenda no encontrada',
   })
-  async buscarPorReferencia(@Param('referencia') referencia: string): Promise<Prenda> {
+  async buscarPorReferencia(
+    @Param('referencia') referencia: string,
+  ): Promise<Prenda> {
     return await this.prendasService.buscarPorReferencia(referencia);
   }
 
@@ -178,7 +184,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener tipos de prendas disponibles',
-    description: 'Lista todos los tipos de prendas que se pueden crear (vestido-dama, traje-caballero, disfraz)',
+    description:
+      'Lista todos los tipos de prendas que se pueden crear (vestido-dama, traje-caballero, disfraz)',
   })
   @ApiResponse({
     status: 200,
@@ -197,7 +204,8 @@ export class PrendasController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener estadísticas de prendas',
-    description: 'Obtiene estadísticas generales sobre las prendas en el sistema',
+    description:
+      'Obtiene estadísticas generales sobre las prendas en el sistema',
   })
   @ApiResponse({
     status: 200,

@@ -39,13 +39,17 @@ export class EmpleadoRepository implements IEmpleadoRepository {
     }
   }
 
-  async buscarPorIdentificacion(numeroIdentificacion: string): Promise<Empleado | null> {
+  async buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Empleado | null> {
     try {
       return await this.empleadoRepository.findOne({
         where: { numeroIdentificacion } as FindOptionsWhere<Empleado>,
       });
     } catch (error) {
-      throw new Error(`Error al buscar empleado por identificación: ${error.message}`);
+      throw new Error(
+        `Error al buscar empleado por identificación: ${error.message}`,
+      );
     }
   }
 
@@ -61,7 +65,7 @@ export class EmpleadoRepository implements IEmpleadoRepository {
 
   async buscarTodos(
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Empleado>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -87,7 +91,7 @@ export class EmpleadoRepository implements IEmpleadoRepository {
   async buscarPorCriterios(
     criterios: Partial<Empleado>,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Empleado>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -125,7 +129,9 @@ export class EmpleadoRepository implements IEmpleadoRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar empleados por criterios: ${error.message}`);
+      throw new Error(
+        `Error al buscar empleados por criterios: ${error.message}`,
+      );
     }
   }
 
@@ -137,7 +143,10 @@ export class EmpleadoRepository implements IEmpleadoRepository {
         throw new NotFoundException(`Empleado con ID ${id} no encontrado`);
       }
 
-      await this.empleadoRepository.update({ id } as FindOptionsWhere<Empleado>, datos);
+      await this.empleadoRepository.update(
+        { id } as FindOptionsWhere<Empleado>,
+        datos,
+      );
 
       const empleadoActualizado = await this.buscarPorId(id);
 
@@ -163,10 +172,14 @@ export class EmpleadoRepository implements IEmpleadoRepository {
       }
 
       const resultado = await this.empleadoRepository.delete({
-        id
+        id,
       } as FindOptionsWhere<Empleado>);
 
-      return resultado.affected !== undefined && resultado.affected !== null && resultado.affected > 0;
+      return (
+        resultado.affected !== undefined &&
+        resultado.affected !== null &&
+        resultado.affected > 0
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -175,7 +188,9 @@ export class EmpleadoRepository implements IEmpleadoRepository {
     }
   }
 
-  async buscarServiciosPorEmpleado(empleadoId: number): Promise<ServicioAlquiler[]> {
+  async buscarServiciosPorEmpleado(
+    empleadoId: number,
+  ): Promise<ServicioAlquiler[]> {
     try {
       return await this.servicioRepository.find({
         where: {
@@ -185,7 +200,9 @@ export class EmpleadoRepository implements IEmpleadoRepository {
         order: { fechaAlquiler: 'DESC' },
       });
     } catch (error) {
-      throw new Error(`Error al buscar servicios del empleado: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios del empleado: ${error.message}`,
+      );
     }
   }
 }

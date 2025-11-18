@@ -49,7 +49,7 @@ describe('PrendasController', () => {
         color: 'Rojo',
         marca: 'Elegance',
         talla: 'M',
-        valorAlquiler: 150.50,
+        valorAlquiler: 150.5,
       };
 
       const prendaCreada = new VestidoDama();
@@ -74,7 +74,9 @@ describe('PrendasController', () => {
       const resultado = await controller.buscarPorReferencia('VD-001');
 
       expect(resultado).toBe(prenda);
-      expect(mockPrendasService.buscarPorReferencia).toHaveBeenCalledWith('VD-001');
+      expect(mockPrendasService.buscarPorReferencia).toHaveBeenCalledWith(
+        'VD-001',
+      );
     });
   });
 
@@ -93,7 +95,11 @@ describe('PrendasController', () => {
       const resultado = await controller.buscarPorTalla('M', 1, 10);
 
       expect(resultado).toEqual(paginationResult);
-      expect(mockPrendasService.buscarPorTalla).toHaveBeenCalledWith('M', 1, 10);
+      expect(mockPrendasService.buscarPorTalla).toHaveBeenCalledWith(
+        'M',
+        1,
+        10,
+      );
     });
   });
 
@@ -107,12 +113,16 @@ describe('PrendasController', () => {
         },
       ];
 
-      mockPrendasService.buscarPorTallaAgrupadoPorTipo.mockResolvedValue(prendasAgrupadas);
+      mockPrendasService.buscarPorTallaAgrupadoPorTipo.mockResolvedValue(
+        prendasAgrupadas,
+      );
 
       const resultado = await controller.buscarPorTallaAgrupado('M');
 
       expect(resultado).toEqual(prendasAgrupadas);
-      expect(mockPrendasService.buscarPorTallaAgrupadoPorTipo).toHaveBeenCalledWith('M');
+      expect(
+        mockPrendasService.buscarPorTallaAgrupadoPorTipo,
+      ).toHaveBeenCalledWith('M');
     });
   });
 
@@ -155,12 +165,14 @@ describe('PrendasController', () => {
 
       mockPrendasService.actualizarPrenda.mockResolvedValue(prendaActualizada);
 
-      const resultado = await controller.actualizarPrenda('VD-001', { color: 'Azul' });
+      const resultado = await controller.actualizarPrenda('VD-001', {
+        color: 'Azul',
+      });
 
       expect(resultado).toBe(prendaActualizada);
       expect(mockPrendasService.actualizarPrenda).toHaveBeenCalledWith(
         'VD-001',
-        { color: 'Azul' }
+        { color: 'Azul' },
       );
     });
   });

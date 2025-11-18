@@ -18,7 +18,10 @@ export class AppController {
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'API Los Atuendos funcionando correctamente' },
+        message: {
+          type: 'string',
+          example: 'API Los Atuendos funcionando correctamente',
+        },
         version: { type: 'string', example: '1.0.0' },
         timestamp: { type: 'string', example: '2025-01-14T10:30:00.000Z' },
         status: { type: 'string', example: 'healthy' },

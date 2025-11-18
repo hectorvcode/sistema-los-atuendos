@@ -8,7 +8,7 @@ import { Disfraz } from '../entities/disfraz.entity';
 import {
   IPrendaRepository,
   PaginationResult,
-  PrendasAgrupadasPorTipo
+  PrendasAgrupadasPorTipo,
 } from '../interfaces/prenda-repository.interface';
 
 /**
@@ -53,7 +53,9 @@ export class PrendaRepository implements IPrendaRepository {
   async guardar(prenda: Prenda): Promise<Prenda> {
     try {
       // Adaptamos el método save de TypeORM a nuestro método guardar
-      const repository = this.getRepositoryByType((prenda as any).tipo || 'prenda');
+      const repository = this.getRepositoryByType(
+        (prenda as any).tipo || 'prenda',
+      );
       return await repository.save(prenda);
     } catch (error) {
       throw new Error(`Error al guardar prenda: ${error.message}`);
@@ -67,14 +69,16 @@ export class PrendaRepository implements IPrendaRepository {
         where: { referencia } as FindOptionsWhere<Prenda>,
       });
     } catch (error) {
-      throw new Error(`Error al buscar prenda por referencia: ${error.message}`);
+      throw new Error(
+        `Error al buscar prenda por referencia: ${error.message}`,
+      );
     }
   }
 
   async buscarPorTalla(
     talla: string,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Prenda>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -99,7 +103,9 @@ export class PrendaRepository implements IPrendaRepository {
     }
   }
 
-  async buscarPorTallaAgrupadoPorTipo(talla: string): Promise<PrendasAgrupadasPorTipo[]> {
+  async buscarPorTallaAgrupadoPorTipo(
+    talla: string,
+  ): Promise<PrendasAgrupadasPorTipo[]> {
     try {
       // Buscar todas las prendas de la talla especificada
       const prendas = await this.prendaRepository.find({
@@ -108,16 +114,19 @@ export class PrendaRepository implements IPrendaRepository {
       });
 
       // Agrupar por tipo manualmente
-      const agrupadas = prendas.reduce((acc, prenda) => {
-        const tipo = (prenda as any).tipo || 'Sin tipo';
+      const agrupadas = prendas.reduce(
+        (acc, prenda) => {
+          const tipo = (prenda as any).tipo || 'Sin tipo';
 
-        if (!acc[tipo]) {
-          acc[tipo] = [];
-        }
+          if (!acc[tipo]) {
+            acc[tipo] = [];
+          }
 
-        acc[tipo].push(prenda);
-        return acc;
-      }, {} as Record<string, Prenda[]>);
+          acc[tipo].push(prenda);
+          return acc;
+        },
+        {} as Record<string, Prenda[]>,
+      );
 
       // Convertir el objeto a array con el formato esperado
       return Object.entries(agrupadas).map(([tipo, prendas]) => ({
@@ -126,13 +135,15 @@ export class PrendaRepository implements IPrendaRepository {
         cantidad: prendas.length,
       }));
     } catch (error) {
-      throw new Error(`Error al buscar prendas por talla agrupadas: ${error.message}`);
+      throw new Error(
+        `Error al buscar prendas por talla agrupadas: ${error.message}`,
+      );
     }
   }
 
   async buscarTodos(
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Prenda>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -158,7 +169,7 @@ export class PrendaRepository implements IPrendaRepository {
   async buscarPorCriterios(
     criterios: Partial<Prenda>,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Prenda>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -179,22 +190,29 @@ export class PrendaRepository implements IPrendaRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar prendas por criterios: ${error.message}`);
+      throw new Error(
+        `Error al buscar prendas por criterios: ${error.message}`,
+      );
     }
   }
 
-  async actualizar(referencia: string, datos: Partial<Prenda>): Promise<Prenda> {
+  async actualizar(
+    referencia: string,
+    datos: Partial<Prenda>,
+  ): Promise<Prenda> {
     try {
       const prenda = await this.buscarPorReferencia(referencia);
 
       if (!prenda) {
-        throw new NotFoundException(`Prenda con referencia ${referencia} no encontrada`);
+        throw new NotFoundException(
+          `Prenda con referencia ${referencia} no encontrada`,
+        );
       }
 
       // Adaptamos el método update y findOne de TypeORM
       await this.prendaRepository.update(
         { referencia } as FindOptionsWhere<Prenda>,
-        datos
+        datos,
       );
 
       const prendaActualizada = await this.buscarPorReferencia(referencia);
@@ -217,15 +235,21 @@ export class PrendaRepository implements IPrendaRepository {
       const prenda = await this.buscarPorReferencia(referencia);
 
       if (!prenda) {
-        throw new NotFoundException(`Prenda con referencia ${referencia} no encontrada`);
+        throw new NotFoundException(
+          `Prenda con referencia ${referencia} no encontrada`,
+        );
       }
 
       // Adaptamos el método delete de TypeORM
       const resultado = await this.prendaRepository.delete({
-        referencia
+        referencia,
       } as FindOptionsWhere<Prenda>);
 
-      return resultado.affected !== undefined && resultado.affected !== null && resultado.affected > 0;
+      return (
+        resultado.affected !== undefined &&
+        resultado.affected !== null &&
+        resultado.affected > 0
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

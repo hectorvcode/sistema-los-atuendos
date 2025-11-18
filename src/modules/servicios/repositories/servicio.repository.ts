@@ -51,7 +51,7 @@ export class ServicioRepository implements IServicioRepository {
   async buscarPorFecha(
     fecha: Date,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -89,7 +89,7 @@ export class ServicioRepository implements IServicioRepository {
     fechaDesde: Date,
     fechaHasta: Date,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -112,11 +112,15 @@ export class ServicioRepository implements IServicioRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar servicios por rango de fechas: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios por rango de fechas: ${error.message}`,
+      );
     }
   }
 
-  async buscarVigentesPorCliente(clienteId: number): Promise<ServicioAlquiler[]> {
+  async buscarVigentesPorCliente(
+    clienteId: number,
+  ): Promise<ServicioAlquiler[]> {
     try {
       return await this.servicioRepository.find({
         where: {
@@ -127,14 +131,16 @@ export class ServicioRepository implements IServicioRepository {
         order: { fechaAlquiler: 'DESC' },
       });
     } catch (error) {
-      throw new Error(`Error al buscar servicios vigentes del cliente: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios vigentes del cliente: ${error.message}`,
+      );
     }
   }
 
   async buscarPorCliente(
     clienteId: number,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -157,14 +163,16 @@ export class ServicioRepository implements IServicioRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar servicios por cliente: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios por cliente: ${error.message}`,
+      );
     }
   }
 
   async buscarPorEmpleado(
     empleadoId: number,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -187,14 +195,16 @@ export class ServicioRepository implements IServicioRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar servicios por empleado: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios por empleado: ${error.message}`,
+      );
     }
   }
 
   async buscarPorEstado(
     estado: string,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -221,7 +231,7 @@ export class ServicioRepository implements IServicioRepository {
 
   async buscarTodos(
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -245,7 +255,10 @@ export class ServicioRepository implements IServicioRepository {
     }
   }
 
-  async actualizar(id: number, datos: Partial<ServicioAlquiler>): Promise<ServicioAlquiler> {
+  async actualizar(
+    id: number,
+    datos: Partial<ServicioAlquiler>,
+  ): Promise<ServicioAlquiler> {
     try {
       const servicio = await this.buscarPorId(id);
 
@@ -253,7 +266,10 @@ export class ServicioRepository implements IServicioRepository {
         throw new NotFoundException(`Servicio con ID ${id} no encontrado`);
       }
 
-      await this.servicioRepository.update({ id } as FindOptionsWhere<ServicioAlquiler>, datos);
+      await this.servicioRepository.update(
+        { id } as FindOptionsWhere<ServicioAlquiler>,
+        datos,
+      );
 
       const servicioActualizado = await this.buscarPorId(id);
 
@@ -279,10 +295,14 @@ export class ServicioRepository implements IServicioRepository {
       }
 
       const resultado = await this.servicioRepository.delete({
-        id
+        id,
       } as FindOptionsWhere<ServicioAlquiler>);
 
-      return resultado.affected !== undefined && resultado.affected !== null && resultado.affected > 0;
+      return (
+        resultado.affected !== undefined &&
+        resultado.affected !== null &&
+        resultado.affected > 0
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

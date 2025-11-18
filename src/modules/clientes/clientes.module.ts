@@ -18,13 +18,7 @@ import { ServicioAlquiler } from '../servicios/entities/servicio-alquiler.entity
     ]),
   ],
   controllers: [ClientesController],
-  providers: [
-    ClientesService,
-    ClienteRepository,
-  ],
-  exports: [
-    ClientesService,
-    ClienteRepository,
-  ],
+  providers: [ClientesService, ClienteRepository],
+  exports: [ClientesService, ClienteRepository],
 })
 export class ClientesModule {}

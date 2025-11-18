@@ -153,10 +153,16 @@ export const createLavanderiaItemTestData = (prendaId: number) => ({
  */
 export const cleanTestData = async (dataSource: any) => {
   // Eliminar en orden debido a foreign keys
-  await dataSource.query('DELETE FROM servicios_prendas WHERE servicio_id IN (SELECT id FROM servicios WHERE observaciones LIKE "%testing%")');
-  await dataSource.query('DELETE FROM servicios WHERE observaciones LIKE "%testing%"');
+  await dataSource.query(
+    'DELETE FROM servicios_prendas WHERE servicio_id IN (SELECT id FROM servicios WHERE observaciones LIKE "%testing%")',
+  );
+  await dataSource.query(
+    'DELETE FROM servicios WHERE observaciones LIKE "%testing%"',
+  );
   await dataSource.query('DELETE FROM lavanderia WHERE id IS NOT NULL');
-  await dataSource.query('DELETE FROM prendas WHERE referencia LIKE "%-TEST-%"');
+  await dataSource.query(
+    'DELETE FROM prendas WHERE referencia LIKE "%-TEST-%"',
+  );
   await dataSource.query('DELETE FROM clientes WHERE email LIKE "%@test.com"');
   await dataSource.query('DELETE FROM empleados WHERE email LIKE "%@test.com"');
 };

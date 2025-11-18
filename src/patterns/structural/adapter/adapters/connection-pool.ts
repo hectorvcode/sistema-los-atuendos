@@ -26,9 +26,7 @@ export class ConnectionPool {
       await conexion.abrir();
       this.conexionesDisponibles.push(conexion);
     }
-    console.log(
-      `✅ Pool inicializado con ${this.tamanoMinimo} conexiones`,
-    );
+    console.log(`✅ Pool inicializado con ${this.tamanoMinimo} conexiones`);
   }
 
   async obtenerConexion(): Promise<Connection> {
@@ -84,14 +82,15 @@ export class ConnectionPool {
     return {
       disponibles: this.conexionesDisponibles.length,
       activas: this.conexionesActivas.length,
-      total:
-        this.conexionesDisponibles.length + this.conexionesActivas.length,
+      total: this.conexionesDisponibles.length + this.conexionesActivas.length,
       minimo: this.tamanoMinimo,
       maximo: this.tamanoMaximo,
     };
   }
 
-  async limpiarConexionesInactivas(tiempoMaximoInactividad: number): Promise<number> {
+  async limpiarConexionesInactivas(
+    tiempoMaximoInactividad: number,
+  ): Promise<number> {
     let eliminadas = 0;
     const ahora = Date.now();
 

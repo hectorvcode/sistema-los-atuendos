@@ -278,9 +278,8 @@ export class AdapterService {
       }
 
       // Confirmar transacción
-      const confirmado = await this.adaptador.confirmarTransaccion(
-        transaccionId,
-      );
+      const confirmado =
+        await this.adaptador.confirmarTransaccion(transaccionId);
 
       if (confirmado) {
         return {
@@ -358,8 +357,7 @@ export class AdapterService {
         (prenda) => () => this.adaptador.guardarNuevaPrenda(prenda),
       );
 
-      const resultado =
-        await this.ejecutarOperacionConTransaccion(operaciones);
+      const resultado = await this.ejecutarOperacionConTransaccion(operaciones);
 
       if (resultado.exito) {
         return {

@@ -40,13 +40,17 @@ export class ClienteRepository implements IClienteRepository {
     }
   }
 
-  async buscarPorIdentificacion(numeroIdentificacion: string): Promise<Cliente | null> {
+  async buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Cliente | null> {
     try {
       return await this.clienteRepository.findOne({
         where: { numeroIdentificacion } as FindOptionsWhere<Cliente>,
       });
     } catch (error) {
-      throw new Error(`Error al buscar cliente por identificación: ${error.message}`);
+      throw new Error(
+        `Error al buscar cliente por identificación: ${error.message}`,
+      );
     }
   }
 
@@ -62,7 +66,7 @@ export class ClienteRepository implements IClienteRepository {
 
   async buscarTodos(
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Cliente>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -88,7 +92,7 @@ export class ClienteRepository implements IClienteRepository {
   async buscarPorCriterios(
     criterios: Partial<Cliente>,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Cliente>> {
     try {
       const skip = (pagina - 1) * limite;
@@ -123,7 +127,9 @@ export class ClienteRepository implements IClienteRepository {
         totalPaginas: Math.ceil(total / limite),
       };
     } catch (error) {
-      throw new Error(`Error al buscar clientes por criterios: ${error.message}`);
+      throw new Error(
+        `Error al buscar clientes por criterios: ${error.message}`,
+      );
     }
   }
 
@@ -135,7 +141,10 @@ export class ClienteRepository implements IClienteRepository {
         throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
       }
 
-      await this.clienteRepository.update({ id } as FindOptionsWhere<Cliente>, datos);
+      await this.clienteRepository.update(
+        { id } as FindOptionsWhere<Cliente>,
+        datos,
+      );
 
       const clienteActualizado = await this.buscarPorId(id);
 
@@ -161,10 +170,14 @@ export class ClienteRepository implements IClienteRepository {
       }
 
       const resultado = await this.clienteRepository.delete({
-        id
+        id,
       } as FindOptionsWhere<Cliente>);
 
-      return resultado.affected !== undefined && resultado.affected !== null && resultado.affected > 0;
+      return (
+        resultado.affected !== undefined &&
+        resultado.affected !== null &&
+        resultado.affected > 0
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -175,7 +188,7 @@ export class ClienteRepository implements IClienteRepository {
 
   async buscarServiciosPorCliente(
     clienteId: number,
-    soloVigentes: boolean = false
+    soloVigentes: boolean = false,
   ): Promise<ServicioAlquiler[]> {
     try {
       const where: any = {
@@ -193,7 +206,9 @@ export class ClienteRepository implements IClienteRepository {
         order: { fechaAlquiler: 'DESC' },
       });
     } catch (error) {
-      throw new Error(`Error al buscar servicios del cliente: ${error.message}`);
+      throw new Error(
+        `Error al buscar servicios del cliente: ${error.message}`,
+      );
     }
   }
 }

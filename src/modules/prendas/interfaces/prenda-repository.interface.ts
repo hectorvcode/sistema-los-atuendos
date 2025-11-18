@@ -17,10 +17,23 @@ export interface PrendasAgrupadasPorTipo {
 export interface IPrendaRepository {
   guardar(prenda: Prenda): Promise<Prenda>;
   buscarPorReferencia(referencia: string): Promise<Prenda | null>;
-  buscarPorTalla(talla: string, pagina?: number, limite?: number): Promise<PaginationResult<Prenda>>;
-  buscarPorTallaAgrupadoPorTipo(talla: string): Promise<PrendasAgrupadasPorTipo[]>;
-  buscarTodos(pagina?: number, limite?: number): Promise<PaginationResult<Prenda>>;
-  buscarPorCriterios(criterios: Partial<Prenda>, pagina?: number, limite?: number): Promise<PaginationResult<Prenda>>;
+  buscarPorTalla(
+    talla: string,
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Prenda>>;
+  buscarPorTallaAgrupadoPorTipo(
+    talla: string,
+  ): Promise<PrendasAgrupadasPorTipo[]>;
+  buscarTodos(
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Prenda>>;
+  buscarPorCriterios(
+    criterios: Partial<Prenda>,
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Prenda>>;
   actualizar(referencia: string, datos: Partial<Prenda>): Promise<Prenda>;
   eliminar(referencia: string): Promise<boolean>;
 }

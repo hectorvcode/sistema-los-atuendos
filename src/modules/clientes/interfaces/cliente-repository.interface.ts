@@ -20,11 +20,23 @@ export interface ServiciosClienteResult {
 export interface IClienteRepository {
   crear(cliente: Cliente): Promise<Cliente>;
   buscarPorId(id: number): Promise<Cliente | null>;
-  buscarPorIdentificacion(numeroIdentificacion: string): Promise<Cliente | null>;
+  buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Cliente | null>;
   buscarPorEmail(correoElectronico: string): Promise<Cliente | null>;
-  buscarTodos(pagina?: number, limite?: number): Promise<PaginationResult<Cliente>>;
-  buscarPorCriterios(criterios: Partial<Cliente>, pagina?: number, limite?: number): Promise<PaginationResult<Cliente>>;
+  buscarTodos(
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Cliente>>;
+  buscarPorCriterios(
+    criterios: Partial<Cliente>,
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Cliente>>;
   actualizar(id: number, datos: Partial<Cliente>): Promise<Cliente>;
   eliminar(id: number): Promise<boolean>;
-  buscarServiciosPorCliente(clienteId: number, soloVigentes?: boolean): Promise<ServicioAlquiler[]>;
+  buscarServiciosPorCliente(
+    clienteId: number,
+    soloVigentes?: boolean,
+  ): Promise<ServicioAlquiler[]>;
 }

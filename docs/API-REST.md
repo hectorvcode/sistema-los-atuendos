@@ -336,11 +336,99 @@ Content-Type: application/json
 GET /api/servicios/numero/1001
 ```
 
-#### Cancelar Servicio
+#### Gestión de Estados del Servicio (State Pattern)
+
+##### Confirmar Servicio
 
 ```http
-PATCH /api/servicios/1/cancelar
+PATCH /api/servicios/:id/confirmar
+
+# Transición: pendiente → confirmado
+# Valida automáticamente que el servicio esté en estado pendiente
 ```
+
+**Respuesta**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "numero": "ALQ-0001",
+    "estado": "confirmado",
+    "fechaAlquiler": "2025-02-15"
+  }
+}
+```
+
+##### Entregar Servicio
+
+```http
+PATCH /api/servicios/:id/entregar
+
+# Transición: confirmado → entregado
+# Valida que no se entregue con más de 7 días de anticipación
+```
+
+##### Devolver Servicio
+
+```http
+PATCH /api/servicios/:id/devolver
+
+# Transición: entregado → devuelto
+# Calcula automáticamente días de retraso
+# Registra fecha de devolución
+```
+
+**Respuesta**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "estado": "devuelto",
+    "fechaDevolucion": "2025-02-16T10:30:00.000Z"
+  }
+}
+```
+
+##### Cancelar Servicio
+
+```http
+PATCH /api/servicios/:id/cancelar
+
+# Transición: pendiente/confirmado → cancelado
+# Valida que no esté entregado
+# Libera prendas automáticamente
+```
+
+##### Obtener Información del Estado
+
+```http
+GET /api/servicios/:id/estado
+```
+
+**Respuesta**:
+```json
+{
+  "success": true,
+  "data": {
+    "estadoActual": "confirmado",
+    "puedeModificar": true,
+    "puedeEliminar": false,
+    "transicionesPermitidas": ["entregado", "cancelado"]
+  }
+}
+```
+
+**Matriz de Transiciones**:
+
+| Estado Actual | Transiciones Permitidas |
+|---------------|------------------------|
+| pendiente     | confirmar, cancelar    |
+| confirmado    | entregar, cancelar     |
+| entregado     | devolver               |
+| devuelto      | ninguna (terminal)     |
+| cancelado     | ninguna (terminal)     |
 
 ### Módulo de Lavandería (Decorator Pattern)
 

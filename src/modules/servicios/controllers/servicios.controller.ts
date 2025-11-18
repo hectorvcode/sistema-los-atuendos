@@ -21,7 +21,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ServiciosService } from '../services/servicios.service';
-import { CreateServicioAlquilerDto, UpdateServicioAlquilerDto, QueryServiciosDto } from '../dto';
+import {
+  CreateServicioAlquilerDto,
+  UpdateServicioAlquilerDto,
+  QueryServiciosDto,
+} from '../dto';
 import { ServicioAlquiler } from '../entities/servicio-alquiler.entity';
 
 /**
@@ -40,7 +44,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nuevo servicio de alquiler',
-    description: 'Crea un servicio de alquiler usando el patrón Builder. Genera número consecutivo automáticamente usando Singleton. Valida disponibilidad de prendas.',
+    description:
+      'Crea un servicio de alquiler usando el patrón Builder. Genera número consecutivo automáticamente usando Singleton. Valida disponibilidad de prendas.',
   })
   @ApiResponse({
     status: 201,
@@ -65,7 +70,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar servicios de alquiler',
-    description: 'Obtiene servicios con filtros opcionales: cliente, empleado, estado, rango de fechas, etc.',
+    description:
+      'Obtiene servicios con filtros opcionales: cliente, empleado, estado, rango de fechas, etc.',
   })
   @ApiResponse({
     status: 200,
@@ -85,7 +91,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener estadísticas de servicios',
-    description: 'Obtiene estadísticas generales: total, por estado, valor total, promedio de prendas',
+    description:
+      'Obtiene estadísticas generales: total, por estado, valor total, promedio de prendas',
   })
   @ApiResponse({
     status: 200,
@@ -102,7 +109,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar servicio por número de alquiler',
-    description: 'Obtiene un servicio específico por su número consecutivo único',
+    description:
+      'Obtiene un servicio específico por su número consecutivo único',
   })
   @ApiParam({
     name: 'numero',
@@ -118,7 +126,9 @@ export class ServiciosController {
     status: 404,
     description: 'Servicio no encontrado',
   })
-  async buscarPorNumero(@Param('numero', ParseIntPipe) numero: number): Promise<ServicioAlquiler> {
+  async buscarPorNumero(
+    @Param('numero', ParseIntPipe) numero: number,
+  ): Promise<ServicioAlquiler> {
     return await this.serviciosService.buscarPorNumero(numero);
   }
 
@@ -129,7 +139,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar servicios por fecha de alquiler',
-    description: 'Obtiene todos los servicios programados para una fecha específica',
+    description:
+      'Obtiene todos los servicios programados para una fecha específica',
   })
   @ApiParam({
     name: 'fecha',
@@ -171,7 +182,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener servicios vigentes de un cliente',
-    description: 'Obtiene servicios en estado confirmado o entregado de un cliente específico',
+    description:
+      'Obtiene servicios en estado confirmado o entregado de un cliente específico',
   })
   @ApiParam({
     name: 'clienteId',
@@ -195,7 +207,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar servicio por ID',
-    description: 'Obtiene un servicio específico por su ID con todas sus relaciones',
+    description:
+      'Obtiene un servicio específico por su ID con todas sus relaciones',
   })
   @ApiParam({
     name: 'id',
@@ -211,7 +224,9 @@ export class ServiciosController {
     status: 404,
     description: 'Servicio no encontrado',
   })
-  async buscarPorId(@Param('id', ParseIntPipe) id: number): Promise<ServicioAlquiler> {
+  async buscarPorId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServicioAlquiler> {
     return await this.serviciosService.buscarPorId(id);
   }
 
@@ -222,7 +237,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Actualizar servicio de alquiler',
-    description: 'Actualiza el estado, fecha de devolución u observaciones de un servicio',
+    description:
+      'Actualiza el estado, fecha de devolución u observaciones de un servicio',
   })
   @ApiParam({
     name: 'id',
@@ -243,17 +259,108 @@ export class ServiciosController {
     @Body(new ValidationPipe({ transform: true, whitelist: true }))
     updateServicioDto: UpdateServicioAlquilerDto,
   ): Promise<ServicioAlquiler> {
-    return await this.serviciosService.actualizarServicio(id, updateServicioDto);
+    return await this.serviciosService.actualizarServicio(
+      id,
+      updateServicioDto,
+    );
   }
 
   /**
-   * PATCH /servicios/:id/cancelar - Cancelar servicio
+   * PATCH /servicios/:id/confirmar - Confirmar servicio (State Pattern)
+   */
+  @Patch(':id/confirmar')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Confirmar servicio de alquiler',
+    description:
+      'Transición de estado: pendiente → confirmado. Usa State Pattern para validar.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del servicio',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Servicio confirmado exitosamente',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Transición de estado inválida',
+  })
+  async confirmarServicio(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServicioAlquiler> {
+    return await this.serviciosService.confirmarServicio(id);
+  }
+
+  /**
+   * PATCH /servicios/:id/entregar - Entregar servicio (State Pattern)
+   */
+  @Patch(':id/entregar')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Entregar servicio al cliente',
+    description:
+      'Transición de estado: confirmado → entregado. Usa State Pattern para validar.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del servicio',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Servicio entregado exitosamente',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Transición de estado inválida',
+  })
+  async entregarServicio(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServicioAlquiler> {
+    return await this.serviciosService.entregarServicio(id);
+  }
+
+  /**
+   * PATCH /servicios/:id/devolver - Devolver servicio (State Pattern)
+   */
+  @Patch(':id/devolver')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Registrar devolución del servicio',
+    description:
+      'Transición de estado: entregado → devuelto. Usa State Pattern para validar.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del servicio',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Servicio devuelto exitosamente',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Transición de estado inválida',
+  })
+  async devolverServicio(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServicioAlquiler> {
+    return await this.serviciosService.devolverServicio(id);
+  }
+
+  /**
+   * PATCH /servicios/:id/cancelar - Cancelar servicio (State Pattern)
    */
   @Patch(':id/cancelar')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Cancelar servicio de alquiler',
-    description: 'Marca el servicio como cancelado y libera las prendas',
+    description:
+      'Transición de estado: pendiente/confirmado → cancelado. Usa State Pattern para validar y libera las prendas.',
   })
   @ApiParam({
     name: 'id',
@@ -265,11 +372,36 @@ export class ServiciosController {
     description: 'Servicio cancelado exitosamente',
   })
   @ApiResponse({
-    status: 404,
-    description: 'Servicio no encontrado',
+    status: 400,
+    description: 'Transición de estado inválida',
   })
-  async cancelarServicio(@Param('id', ParseIntPipe) id: number): Promise<ServicioAlquiler> {
+  async cancelarServicio(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServicioAlquiler> {
     return await this.serviciosService.cancelarServicio(id);
+  }
+
+  /**
+   * GET /servicios/:id/estado - Obtener información del estado (State Pattern)
+   */
+  @Get(':id/estado')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener información del estado del servicio',
+    description:
+      'Obtiene el estado actual, transiciones permitidas y acciones disponibles usando State Pattern',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del servicio',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Información del estado obtenida exitosamente',
+  })
+  async obtenerInformacionEstado(@Param('id', ParseIntPipe) id: number) {
+    return await this.serviciosService.obtenerInformacionEstado(id);
   }
 
   /**
@@ -279,7 +411,8 @@ export class ServiciosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Eliminar servicio de alquiler',
-    description: 'Elimina permanentemente un servicio y libera las prendas asociadas',
+    description:
+      'Elimina permanentemente un servicio y libera las prendas asociadas',
   })
   @ApiParam({
     name: 'id',

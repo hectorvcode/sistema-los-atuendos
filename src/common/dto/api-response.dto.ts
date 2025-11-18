@@ -85,7 +85,10 @@ export class ApiErrorResponseDto {
       type: 'object',
       properties: {
         field: { type: 'string', example: 'email' },
-        message: { type: 'string', example: 'Email must be a valid email address' },
+        message: {
+          type: 'string',
+          example: 'Email must be a valid email address',
+        },
         constraint: { type: 'string', example: 'isEmail' },
       },
     },

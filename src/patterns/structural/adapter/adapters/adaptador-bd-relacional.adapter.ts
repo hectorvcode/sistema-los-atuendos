@@ -299,9 +299,8 @@ export class AdaptadorBDRelacional implements IPersistenciaPrendas {
   async limpiarConexionesInactivas(): Promise<void> {
     try {
       if (this.connectionPool) {
-        const eliminadas = await this.connectionPool.limpiarConexionesInactivas(
-          60000,
-        ); // 1 minuto
+        const eliminadas =
+          await this.connectionPool.limpiarConexionesInactivas(60000); // 1 minuto
         console.log(`🧹 ${eliminadas} conexiones inactivas eliminadas`);
       }
     } catch (error) {

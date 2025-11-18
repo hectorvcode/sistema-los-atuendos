@@ -18,23 +18,12 @@ import { CreationalPatternsModule } from '../../patterns/creational/creational-p
 @Module({
   imports: [
     // Importar las entidades de TypeORM
-    TypeOrmModule.forFeature([
-      Prenda,
-      VestidoDama,
-      TrajeCaballero,
-      Disfraz,
-    ]),
+    TypeOrmModule.forFeature([Prenda, VestidoDama, TrajeCaballero, Disfraz]),
     // Importar el módulo de patrones creacionales que contiene el Factory
     CreationalPatternsModule,
   ],
   controllers: [PrendasController],
-  providers: [
-    PrendasService,
-    PrendaRepository,
-  ],
-  exports: [
-    PrendasService,
-    PrendaRepository,
-  ],
+  providers: [PrendasService, PrendaRepository],
+  exports: [PrendasService, PrendaRepository],
 })
 export class PrendasModule {}

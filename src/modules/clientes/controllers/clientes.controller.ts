@@ -40,7 +40,8 @@ export class ClientesController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nuevo cliente',
-    description: 'Registra un nuevo cliente en el sistema con validación de datos únicos',
+    description:
+      'Registra un nuevo cliente en el sistema con validación de datos únicos',
   })
   @ApiResponse({
     status: 201,
@@ -69,7 +70,8 @@ export class ClientesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar clientes',
-    description: 'Obtiene un listado de clientes con filtros opcionales y paginación',
+    description:
+      'Obtiene un listado de clientes con filtros opcionales y paginación',
   })
   @ApiResponse({
     status: 200,
@@ -89,7 +91,8 @@ export class ClientesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener estadísticas de clientes',
-    description: 'Obtiene estadísticas generales sobre los clientes en el sistema',
+    description:
+      'Obtiene estadísticas generales sobre los clientes en el sistema',
   })
   @ApiResponse({
     status: 200,
@@ -133,7 +136,8 @@ export class ClientesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener servicios de alquiler del cliente',
-    description: 'Obtiene todos los servicios de alquiler asociados a un cliente con información detallada de las prendas',
+    description:
+      'Obtiene todos los servicios de alquiler asociados a un cliente con información detallada de las prendas',
   })
   @ApiParam({
     name: 'id',
@@ -144,7 +148,8 @@ export class ClientesController {
     name: 'vigentes',
     required: false,
     type: Boolean,
-    description: 'Si es true, solo retorna servicios vigentes (confirmados o entregados)',
+    description:
+      'Si es true, solo retorna servicios vigentes (confirmados o entregados)',
   })
   @ApiResponse({
     status: 200,
@@ -156,9 +161,13 @@ export class ClientesController {
   })
   async obtenerServiciosCliente(
     @Param('id', ParseIntPipe) id: number,
-    @Query('vigentes', new ParseBoolPipe({ optional: true })) vigentes?: boolean,
+    @Query('vigentes', new ParseBoolPipe({ optional: true }))
+    vigentes?: boolean,
   ) {
-    return await this.clientesService.obtenerServiciosCliente(id, vigentes || false);
+    return await this.clientesService.obtenerServiciosCliente(
+      id,
+      vigentes || false,
+    );
   }
 
   /**
@@ -168,7 +177,8 @@ export class ClientesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar cliente por número de identificación',
-    description: 'Obtiene un cliente específico por su número de identificación',
+    description:
+      'Obtiene un cliente específico por su número de identificación',
   })
   @ApiParam({
     name: 'numeroIdentificacion',
@@ -187,7 +197,9 @@ export class ClientesController {
   async buscarPorIdentificacion(
     @Param('numeroIdentificacion') numeroIdentificacion: string,
   ): Promise<Cliente> {
-    return await this.clientesService.buscarPorIdentificacion(numeroIdentificacion);
+    return await this.clientesService.buscarPorIdentificacion(
+      numeroIdentificacion,
+    );
   }
 
   /**
@@ -247,7 +259,9 @@ export class ClientesController {
     status: 404,
     description: 'Cliente no encontrado',
   })
-  async desactivarCliente(@Param('id', ParseIntPipe) id: number): Promise<Cliente> {
+  async desactivarCliente(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Cliente> {
     return await this.clientesService.desactivarCliente(id);
   }
 

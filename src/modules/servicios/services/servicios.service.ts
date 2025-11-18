@@ -1,23 +1,35 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ServicioAlquilerBuilder } from '../../../patterns/creational/builder/servicio-alquiler.builder';
 import { ServicioRepository } from '../repositories/servicio.repository';
 import { ServicioAlquiler } from '../entities/servicio-alquiler.entity';
-import { CreateServicioAlquilerDto, UpdateServicioAlquilerDto, QueryServiciosDto } from '../dto';
+import {
+  CreateServicioAlquilerDto,
+  UpdateServicioAlquilerDto,
+  QueryServiciosDto,
+} from '../dto';
 import { PaginationResult } from '../interfaces/servicio-repository.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Prenda } from '../../prendas/entities/prenda.entity';
+import { ServicioStateContext } from '../../../patterns/behavioral/state';
 
 /**
  * ServiciosService - Lógica de negocio para servicios de alquiler
- * Implementa el patrón Builder para construcción compleja de servicios
- * Usa Singleton para generación de consecutivos
+ * Implementa patrones de diseño:
+ * - Builder Pattern para construcción compleja de servicios
+ * - Singleton Pattern para generación de consecutivos
+ * - State Pattern para gestión del ciclo de vida del servicio
  */
 @Injectable()
 export class ServiciosService {
   constructor(
     private readonly servicioAlquilerBuilder: ServicioAlquilerBuilder,
     private readonly servicioRepository: ServicioRepository,
+    private readonly stateContext: ServicioStateContext,
     @InjectRepository(Prenda)
     private readonly prendaRepository: Repository<Prenda>,
   ) {}
@@ -26,7 +38,9 @@ export class ServiciosService {
    * Crea un nuevo servicio de alquiler usando el patrón Builder
    * El Builder internamente usa el Singleton para generar el número consecutivo
    */
-  async crearServicio(createServicioDto: CreateServicioAlquilerDto): Promise<ServicioAlquiler> {
+  async crearServicio(
+    createServicioDto: CreateServicioAlquilerDto,
+  ): Promise<ServicioAlquiler> {
     try {
       // Validar que la fecha no sea en el pasado
       const fechaAlquiler = new Date(createServicioDto.fechaAlquiler);
@@ -34,7 +48,9 @@ export class ServiciosService {
       hoy.setHours(0, 0, 0, 0);
 
       if (fechaAlquiler < hoy) {
-        throw new BadRequestException('La fecha de alquiler no puede ser en el pasado');
+        throw new BadRequestException(
+          'La fecha de alquiler no puede ser en el pasado',
+        );
       }
 
       // Validar que las prendas existan y estén disponibles
@@ -60,34 +76,42 @@ export class ServiciosService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new BadRequestException(`Error al crear servicio: ${error.message}`);
+      throw new BadRequestException(
+        `Error al crear servicio: ${error.message}`,
+      );
     }
   }
 
   /**
    * Valida que las prendas existan y estén disponibles
    */
-  private async validarDisponibilidadPrendas(prendasIds: number[]): Promise<void> {
+  private async validarDisponibilidadPrendas(
+    prendasIds: number[],
+  ): Promise<void> {
     const prendas = await this.prendaRepository.find({
       where: { id: In(prendasIds) },
     });
 
     if (prendas.length !== prendasIds.length) {
-      const prendasEncontradas = prendas.map(p => p.id);
-      const prendasNoEncontradas = prendasIds.filter(id => !prendasEncontradas.includes(id));
+      const prendasEncontradas = prendas.map((p) => p.id);
+      const prendasNoEncontradas = prendasIds.filter(
+        (id) => !prendasEncontradas.includes(id),
+      );
       throw new BadRequestException(
-        `Las siguientes prendas no fueron encontradas: ${prendasNoEncontradas.join(', ')}`
+        `Las siguientes prendas no fueron encontradas: ${prendasNoEncontradas.join(', ')}`,
       );
     }
 
     const prendasNoDisponibles = prendas.filter(
-      p => !p.disponible || p.estado !== 'disponible'
+      (p) => !p.disponible || p.estado !== 'disponible',
     );
 
     if (prendasNoDisponibles.length > 0) {
-      const referencias = prendasNoDisponibles.map(p => p.referencia).join(', ');
+      const referencias = prendasNoDisponibles
+        .map((p) => p.referencia)
+        .join(', ');
       throw new BadRequestException(
-        `Las siguientes prendas no están disponibles: ${referencias}`
+        `Las siguientes prendas no están disponibles: ${referencias}`,
       );
     }
   }
@@ -112,7 +136,9 @@ export class ServiciosService {
     const servicio = await this.servicioRepository.buscarPorNumero(numero);
 
     if (!servicio) {
-      throw new NotFoundException(`Servicio con número ${numero} no encontrado`);
+      throw new NotFoundException(
+        `Servicio con número ${numero} no encontrado`,
+      );
     }
 
     return servicio;
@@ -124,38 +150,58 @@ export class ServiciosService {
   async buscarPorFecha(
     fecha: string,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<ServicioAlquiler>> {
     const fechaBusqueda = new Date(fecha);
-    return await this.servicioRepository.buscarPorFecha(fechaBusqueda, pagina, limite);
+    return await this.servicioRepository.buscarPorFecha(
+      fechaBusqueda,
+      pagina,
+      limite,
+    );
   }
 
   /**
    * Busca servicios vigentes por cliente (confirmados o entregados)
    */
-  async buscarVigentesPorCliente(clienteId: number): Promise<ServicioAlquiler[]> {
+  async buscarVigentesPorCliente(
+    clienteId: number,
+  ): Promise<ServicioAlquiler[]> {
     return await this.servicioRepository.buscarVigentesPorCliente(clienteId);
   }
 
   /**
    * Busca servicios con filtros y paginación
    */
-  async buscarServicios(query: QueryServiciosDto): Promise<PaginationResult<ServicioAlquiler>> {
+  async buscarServicios(
+    query: QueryServiciosDto,
+  ): Promise<PaginationResult<ServicioAlquiler>> {
     const { pagina = 1, limite = 10 } = query;
 
     // Buscar por cliente
     if (query.clienteId) {
-      return await this.servicioRepository.buscarPorCliente(query.clienteId, pagina, limite);
+      return await this.servicioRepository.buscarPorCliente(
+        query.clienteId,
+        pagina,
+        limite,
+      );
     }
 
     // Buscar por empleado
     if (query.empleadoId) {
-      return await this.servicioRepository.buscarPorEmpleado(query.empleadoId, pagina, limite);
+      return await this.servicioRepository.buscarPorEmpleado(
+        query.empleadoId,
+        pagina,
+        limite,
+      );
     }
 
     // Buscar por estado
     if (query.estado) {
-      return await this.servicioRepository.buscarPorEstado(query.estado, pagina, limite);
+      return await this.servicioRepository.buscarPorEstado(
+        query.estado,
+        pagina,
+        limite,
+      );
     }
 
     // Buscar por rango de fechas
@@ -166,14 +212,18 @@ export class ServiciosService {
         fechaDesde,
         fechaHasta,
         pagina,
-        limite
+        limite,
       );
     }
 
     // Buscar por fecha específica
     if (query.fechaDesde) {
       const fecha = new Date(query.fechaDesde);
-      return await this.servicioRepository.buscarPorFecha(fecha, pagina, limite);
+      return await this.servicioRepository.buscarPorFecha(
+        fecha,
+        pagina,
+        limite,
+      );
     }
 
     // Buscar todos
@@ -182,28 +232,35 @@ export class ServiciosService {
 
   /**
    * Actualiza un servicio existente
+   * Usa State Pattern para validar modificaciones según el estado actual
    */
   async actualizarServicio(
     id: number,
-    updateServicioDto: UpdateServicioAlquilerDto
+    updateServicioDto: UpdateServicioAlquilerDto,
   ): Promise<ServicioAlquiler> {
-    // Verificar que el servicio existe
-    await this.buscarPorId(id);
+    const servicio = await this.buscarPorId(id);
+
+    // Validar si se puede modificar usando State Pattern
+    if (!this.stateContext.puedeModificar(servicio)) {
+      throw new BadRequestException(
+        `No se puede modificar un servicio en estado ${servicio.estado}`,
+      );
+    }
 
     const datosActualizacion: Partial<ServicioAlquiler> = {};
 
     if (updateServicioDto.fechaDevolucion) {
-      datosActualizacion.fechaDevolucion = new Date(updateServicioDto.fechaDevolucion);
+      datosActualizacion.fechaDevolucion = new Date(
+        updateServicioDto.fechaDevolucion,
+      );
     }
 
     if (updateServicioDto.estado) {
-      datosActualizacion.estado = updateServicioDto.estado;
-
-      // Si el servicio se devuelve, marcar prendas como disponibles
-      if (updateServicioDto.estado === 'devuelto') {
-        const servicio = await this.buscarPorId(id);
-        await this.liberarPrendas(servicio.prendas.map(p => p.id));
-      }
+      // Las transiciones de estado ahora se manejan mediante métodos específicos
+      // Esta actualización directa solo debe usarse para otros campos
+      throw new BadRequestException(
+        'Use los métodos específicos para cambiar el estado: confirmarServicio, entregarServicio, devolverServicio, cancelarServicio',
+      );
     }
 
     if (updateServicioDto.observaciones !== undefined) {
@@ -226,30 +283,92 @@ export class ServiciosService {
   }
 
   /**
+   * Confirma un servicio (pendiente → confirmado)
+   * Usa State Pattern para validar la transición
+   */
+  async confirmarServicio(id: number): Promise<ServicioAlquiler> {
+    const servicio = await this.buscarPorId(id);
+
+    // Usar State Pattern para la transición
+    await this.stateContext.confirmar(servicio);
+
+    // Persistir el cambio
+    return await this.servicioRepository.actualizar(id, {
+      estado: servicio.estado,
+    });
+  }
+
+  /**
+   * Entrega un servicio al cliente (confirmado → entregado)
+   * Usa State Pattern para validar la transición
+   */
+  async entregarServicio(id: number): Promise<ServicioAlquiler> {
+    const servicio = await this.buscarPorId(id);
+
+    // Usar State Pattern para la transición
+    await this.stateContext.entregar(servicio);
+
+    // Persistir el cambio
+    return await this.servicioRepository.actualizar(id, {
+      estado: servicio.estado,
+    });
+  }
+
+  /**
+   * Registra la devolución de un servicio (entregado → devuelto)
+   * Usa State Pattern para validar la transición
+   */
+  async devolverServicio(id: number): Promise<ServicioAlquiler> {
+    const servicio = await this.buscarPorId(id);
+
+    // Usar State Pattern para la transición
+    await this.stateContext.devolver(servicio);
+
+    // Liberar prendas (ahora van a lavandería)
+    await this.liberarPrendas(servicio.prendas.map((p) => p.id));
+
+    // Persistir el cambio con la fecha de devolución
+    return await this.servicioRepository.actualizar(id, {
+      estado: servicio.estado,
+      fechaDevolucion: servicio.fechaDevolucion,
+    });
+  }
+
+  /**
    * Cancela un servicio
+   * Usa State Pattern para validar la transición
    */
   async cancelarServicio(id: number): Promise<ServicioAlquiler> {
     const servicio = await this.buscarPorId(id);
 
-    if (servicio.estado === 'devuelto') {
-      throw new BadRequestException('No se puede cancelar un servicio ya devuelto');
-    }
+    // Usar State Pattern para la transición (validará automáticamente)
+    await this.stateContext.cancelar(servicio);
 
     // Liberar prendas
-    await this.liberarPrendas(servicio.prendas.map(p => p.id));
+    await this.liberarPrendas(servicio.prendas.map((p) => p.id));
 
     // Actualizar estado a cancelado
-    return await this.servicioRepository.actualizar(id, { estado: 'cancelado' });
+    return await this.servicioRepository.actualizar(id, {
+      estado: servicio.estado,
+    });
   }
 
   /**
    * Elimina un servicio
+   * Usa State Pattern para validar si se puede eliminar
    */
   async eliminarServicio(id: number): Promise<{ mensaje: string }> {
     const servicio = await this.buscarPorId(id);
 
+    // Validar si se puede eliminar usando State Pattern
+    if (!this.stateContext.puedeEliminar(servicio)) {
+      throw new BadRequestException(
+        `No se puede eliminar un servicio en estado ${servicio.estado}. Solo se pueden eliminar servicios pendientes o cancelados.`,
+      );
+    }
+
     // Liberar prendas antes de eliminar
-    await this.liberarPrendas(servicio.prendas.map(p => p.id));
+    await this.liberarPrendas(servicio.prendas.map((p) => p.id));
 
     const eliminado = await this.servicioRepository.eliminar(id);
 
@@ -260,6 +379,15 @@ export class ServiciosService {
     return {
       mensaje: `Servicio #${servicio.numero} eliminado exitosamente`,
     };
+  }
+
+  /**
+   * Obtiene información del estado actual del servicio
+   * Incluye transiciones permitidas
+   */
+  async obtenerInformacionEstado(id: number) {
+    const servicio = await this.buscarPorId(id);
+    return this.stateContext.obtenerInformacionEstado(servicio);
   }
 
   /**
@@ -276,7 +404,7 @@ export class ServiciosService {
     };
 
     // Agrupar por estado
-    todosServicios.data.forEach(servicio => {
+    todosServicios.data.forEach((servicio) => {
       estadisticas.porEstado[servicio.estado] =
         (estadisticas.porEstado[servicio.estado] || 0) + 1;
       estadisticas.valorTotal += Number(servicio.valorTotal);
@@ -285,11 +413,12 @@ export class ServiciosService {
     // Calcular promedio de prendas
     const totalPrendas = todosServicios.data.reduce(
       (sum, servicio) => sum + (servicio.prendas?.length || 0),
-      0
+      0,
     );
-    estadisticas.promedioPrendas = todosServicios.total > 0
-      ? Math.round((totalPrendas / todosServicios.total) * 100) / 100
-      : 0;
+    estadisticas.promedioPrendas =
+      todosServicios.total > 0
+        ? Math.round((totalPrendas / todosServicios.total) * 100) / 100
+        : 0;
 
     return estadisticas;
   }

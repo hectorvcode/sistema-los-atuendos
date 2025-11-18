@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrendasService } from '../services/prendas.service';
 import { PrendaRepository } from '../repositories/prenda.repository';
 import { PrendaFactoryRegistry } from '../../../patterns/creational/factory/prenda-factory.registry';
@@ -63,7 +67,7 @@ describe('PrendasService', () => {
         color: 'Rojo',
         marca: 'Elegance',
         talla: 'M',
-        valorAlquiler: 150.50,
+        valorAlquiler: 150.5,
         propiedadesEspecificas: {
           tienePedreria: true,
           esLargo: true,
@@ -87,7 +91,9 @@ describe('PrendasService', () => {
 
       expect(resultado).toBeDefined();
       expect(mockPrendaFactory.getTiposDisponibles).toHaveBeenCalled();
-      expect(mockPrendaRepository.buscarPorReferencia).toHaveBeenCalledWith('VD-001');
+      expect(mockPrendaRepository.buscarPorReferencia).toHaveBeenCalledWith(
+        'VD-001',
+      );
       expect(mockPrendaFactory.crearPrenda).toHaveBeenCalledWith(
         'vestido-dama',
         expect.objectContaining({
@@ -95,11 +101,11 @@ describe('PrendasService', () => {
           color: 'Rojo',
           marca: 'Elegance',
           talla: 'M',
-          valorAlquiler: 150.50,
+          valorAlquiler: 150.5,
           tienePedreria: true,
           esLargo: true,
           cantidadPiezas: 2,
-        })
+        }),
       );
       // No se llama a guardar porque el factory ya persiste la prenda
       expect(mockPrendaRepository.guardar).not.toHaveBeenCalled();
@@ -121,7 +127,9 @@ describe('PrendasService', () => {
         'disfraz',
       ]);
 
-      await expect(service.crearPrenda(createDto)).rejects.toThrow(BadRequestException);
+      await expect(service.crearPrenda(createDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('debería lanzar ConflictException si la referencia ya existe', async () => {
@@ -131,7 +139,7 @@ describe('PrendasService', () => {
         color: 'Rojo',
         marca: 'Elegance',
         talla: 'M',
-        valorAlquiler: 150.50,
+        valorAlquiler: 150.5,
       };
 
       const prendaExistente = new VestidoDama();
@@ -142,9 +150,13 @@ describe('PrendasService', () => {
         'traje-caballero',
         'disfraz',
       ]);
-      mockPrendaRepository.buscarPorReferencia.mockResolvedValue(prendaExistente);
+      mockPrendaRepository.buscarPorReferencia.mockResolvedValue(
+        prendaExistente,
+      );
 
-      await expect(service.crearPrenda(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.crearPrenda(createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -158,13 +170,17 @@ describe('PrendasService', () => {
       const resultado = await service.buscarPorReferencia('VD-001');
 
       expect(resultado).toBe(prenda);
-      expect(mockPrendaRepository.buscarPorReferencia).toHaveBeenCalledWith('VD-001');
+      expect(mockPrendaRepository.buscarPorReferencia).toHaveBeenCalledWith(
+        'VD-001',
+      );
     });
 
     it('debería lanzar NotFoundException si la prenda no existe', async () => {
       mockPrendaRepository.buscarPorReferencia.mockResolvedValue(null);
 
-      await expect(service.buscarPorReferencia('NO-EXISTE')).rejects.toThrow(NotFoundException);
+      await expect(service.buscarPorReferencia('NO-EXISTE')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -183,11 +199,17 @@ describe('PrendasService', () => {
       const resultado = await service.buscarPorTalla('M', 1, 10);
 
       expect(resultado).toEqual(paginationResult);
-      expect(mockPrendaRepository.buscarPorTalla).toHaveBeenCalledWith('M', 1, 10);
+      expect(mockPrendaRepository.buscarPorTalla).toHaveBeenCalledWith(
+        'M',
+        1,
+        10,
+      );
     });
 
     it('debería lanzar BadRequestException si no se proporciona talla', async () => {
-      await expect(service.buscarPorTalla('', 1, 10)).rejects.toThrow(BadRequestException);
+      await expect(service.buscarPorTalla('', 1, 10)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -201,16 +223,22 @@ describe('PrendasService', () => {
         },
       ];
 
-      mockPrendaRepository.buscarPorTallaAgrupadoPorTipo.mockResolvedValue(prendasAgrupadas);
+      mockPrendaRepository.buscarPorTallaAgrupadoPorTipo.mockResolvedValue(
+        prendasAgrupadas,
+      );
 
       const resultado = await service.buscarPorTallaAgrupadoPorTipo('M');
 
       expect(resultado).toEqual(prendasAgrupadas);
-      expect(mockPrendaRepository.buscarPorTallaAgrupadoPorTipo).toHaveBeenCalledWith('M');
+      expect(
+        mockPrendaRepository.buscarPorTallaAgrupadoPorTipo,
+      ).toHaveBeenCalledWith('M');
     });
 
     it('debería lanzar BadRequestException si no se proporciona talla', async () => {
-      await expect(service.buscarPorTallaAgrupadoPorTipo('')).rejects.toThrow(BadRequestException);
+      await expect(service.buscarPorTallaAgrupadoPorTipo('')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -223,24 +251,28 @@ describe('PrendasService', () => {
       prendaActualizada.referencia = 'VD-001';
       prendaActualizada.color = 'Azul';
 
-      mockPrendaRepository.buscarPorReferencia.mockResolvedValue(prendaExistente);
+      mockPrendaRepository.buscarPorReferencia.mockResolvedValue(
+        prendaExistente,
+      );
       mockPrendaRepository.actualizar.mockResolvedValue(prendaActualizada);
 
-      const resultado = await service.actualizarPrenda('VD-001', { color: 'Azul' });
+      const resultado = await service.actualizarPrenda('VD-001', {
+        color: 'Azul',
+      });
 
       expect(resultado).toBe(prendaActualizada);
       expect(mockPrendaRepository.actualizar).toHaveBeenCalledWith(
         'VD-001',
-        expect.objectContaining({ color: 'Azul' })
+        expect.objectContaining({ color: 'Azul' }),
       );
     });
 
     it('debería lanzar NotFoundException si la prenda no existe', async () => {
       mockPrendaRepository.buscarPorReferencia.mockResolvedValue(null);
 
-      await expect(service.actualizarPrenda('NO-EXISTE', { color: 'Azul' })).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(
+        service.actualizarPrenda('NO-EXISTE', { color: 'Azul' }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -263,7 +295,9 @@ describe('PrendasService', () => {
     it('debería lanzar NotFoundException si la prenda no existe', async () => {
       mockPrendaRepository.buscarPorReferencia.mockResolvedValue(null);
 
-      await expect(service.eliminarPrenda('NO-EXISTE')).rejects.toThrow(NotFoundException);
+      await expect(service.eliminarPrenda('NO-EXISTE')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

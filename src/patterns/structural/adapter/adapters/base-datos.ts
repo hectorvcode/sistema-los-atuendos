@@ -26,7 +26,9 @@ export class BaseDatos {
     try {
       this.configuracion = config;
       this.conectado = true;
-      console.log(`✅ Conexión abierta a ${config.tipo}://${config.servidor}:${config.puerto}/${config.baseDatos}`);
+      console.log(
+        `✅ Conexión abierta a ${config.tipo}://${config.servidor}:${config.puerto}/${config.baseDatos}`,
+      );
       return true;
     } catch (error) {
       console.error('❌ Error abriendo conexión:', error);

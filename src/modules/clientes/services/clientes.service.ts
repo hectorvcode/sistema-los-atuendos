@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { ClienteRepository } from '../repositories/cliente.repository';
 import { Cliente } from '../entities/cliente.entity';
 import { CreateClienteDto, UpdateClienteDto, QueryClientesDto } from '../dto';
@@ -9,9 +14,7 @@ import { PaginationResult } from '../interfaces/cliente-repository.interface';
  */
 @Injectable()
 export class ClientesService {
-  constructor(
-    private readonly clienteRepository: ClienteRepository,
-  ) {}
+  constructor(private readonly clienteRepository: ClienteRepository) {}
 
   /**
    * Crea un nuevo cliente con validaciones de negocio
@@ -19,24 +22,25 @@ export class ClientesService {
   async crearCliente(createClienteDto: CreateClienteDto): Promise<Cliente> {
     try {
       // Validar que la identificación no exista
-      const clientePorIdentificacion = await this.clienteRepository.buscarPorIdentificacion(
-        createClienteDto.numeroIdentificacion
-      );
+      const clientePorIdentificacion =
+        await this.clienteRepository.buscarPorIdentificacion(
+          createClienteDto.numeroIdentificacion,
+        );
 
       if (clientePorIdentificacion) {
         throw new ConflictException(
-          `Ya existe un cliente con la identificación ${createClienteDto.numeroIdentificacion}`
+          `Ya existe un cliente con la identificación ${createClienteDto.numeroIdentificacion}`,
         );
       }
 
       // Validar que el email no exista
       const clientePorEmail = await this.clienteRepository.buscarPorEmail(
-        createClienteDto.correoElectronico
+        createClienteDto.correoElectronico,
       );
 
       if (clientePorEmail) {
         throw new ConflictException(
-          `Ya existe un cliente con el email ${createClienteDto.correoElectronico}`
+          `Ya existe un cliente con el email ${createClienteDto.correoElectronico}`,
         );
       }
 
@@ -69,12 +73,17 @@ export class ClientesService {
   /**
    * Busca un cliente por número de identificación
    */
-  async buscarPorIdentificacion(numeroIdentificacion: string): Promise<Cliente> {
-    const cliente = await this.clienteRepository.buscarPorIdentificacion(numeroIdentificacion);
+  async buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Cliente> {
+    const cliente =
+      await this.clienteRepository.buscarPorIdentificacion(
+        numeroIdentificacion,
+      );
 
     if (!cliente) {
       throw new NotFoundException(
-        `Cliente con identificación ${numeroIdentificacion} no encontrado`
+        `Cliente con identificación ${numeroIdentificacion} no encontrado`,
       );
     }
 
@@ -84,7 +93,9 @@ export class ClientesService {
   /**
    * Busca clientes con filtros y paginación
    */
-  async buscarClientes(query: QueryClientesDto): Promise<PaginationResult<Cliente>> {
+  async buscarClientes(
+    query: QueryClientesDto,
+  ): Promise<PaginationResult<Cliente>> {
     const { pagina = 1, limite = 10, ...criterios } = query;
 
     // Si no hay criterios, buscar todos
@@ -110,26 +121,30 @@ export class ClientesService {
     return await this.clienteRepository.buscarPorCriterios(
       criteriosBusqueda,
       pagina,
-      limite
+      limite,
     );
   }
 
   /**
    * Actualiza un cliente existente
    */
-  async actualizarCliente(id: number, updateClienteDto: UpdateClienteDto): Promise<Cliente> {
+  async actualizarCliente(
+    id: number,
+    updateClienteDto: UpdateClienteDto,
+  ): Promise<Cliente> {
     // Verificar que el cliente existe
     await this.buscarPorId(id);
 
     // Si se intenta cambiar la identificación, validar que no exista
     if (updateClienteDto.numeroIdentificacion) {
-      const clienteExistente = await this.clienteRepository.buscarPorIdentificacion(
-        updateClienteDto.numeroIdentificacion
-      );
+      const clienteExistente =
+        await this.clienteRepository.buscarPorIdentificacion(
+          updateClienteDto.numeroIdentificacion,
+        );
 
       if (clienteExistente && clienteExistente.id !== id) {
         throw new ConflictException(
-          `Ya existe otro cliente con la identificación ${updateClienteDto.numeroIdentificacion}`
+          `Ya existe otro cliente con la identificación ${updateClienteDto.numeroIdentificacion}`,
         );
       }
     }
@@ -137,12 +152,12 @@ export class ClientesService {
     // Si se intenta cambiar el email, validar que no exista
     if (updateClienteDto.correoElectronico) {
       const clienteExistente = await this.clienteRepository.buscarPorEmail(
-        updateClienteDto.correoElectronico
+        updateClienteDto.correoElectronico,
       );
 
       if (clienteExistente && clienteExistente.id !== id) {
         throw new ConflictException(
-          `Ya existe otro cliente con el email ${updateClienteDto.correoElectronico}`
+          `Ya existe otro cliente con el email ${updateClienteDto.correoElectronico}`,
         );
       }
     }
@@ -180,7 +195,7 @@ export class ClientesService {
    */
   async obtenerServiciosCliente(
     clienteId: number,
-    soloVigentes: boolean = false
+    soloVigentes: boolean = false,
   ) {
     // Verificar que el cliente existe
     const cliente = await this.buscarPorId(clienteId);
@@ -188,17 +203,17 @@ export class ClientesService {
     // Obtener servicios
     const servicios = await this.clienteRepository.buscarServiciosPorCliente(
       clienteId,
-      soloVigentes
+      soloVigentes,
     );
 
     // Calcular estadísticas
     const serviciosVigentes = servicios.filter(
-      s => s.estado === 'confirmado' || s.estado === 'entregado'
+      (s) => s.estado === 'confirmado' || s.estado === 'entregado',
     ).length;
 
     const valorTotal = servicios.reduce(
       (sum, servicio) => sum + Number(servicio.valorTotal),
-      0
+      0,
     );
 
     return {
@@ -208,14 +223,14 @@ export class ClientesService {
         numeroIdentificacion: cliente.numeroIdentificacion,
         correoElectronico: cliente.correoElectronico,
       },
-      servicios: servicios.map(servicio => ({
+      servicios: servicios.map((servicio) => ({
         id: servicio.id,
         numero: servicio.numero,
         fechaAlquiler: servicio.fechaAlquiler,
         fechaDevolucion: servicio.fechaDevolucion,
         estado: servicio.estado,
         valorTotal: servicio.valorTotal,
-        prendas: servicio.prendas?.map(prenda => ({
+        prendas: servicio.prendas?.map((prenda) => ({
           id: prenda.id,
           referencia: prenda.referencia,
           tipo: (prenda as any).tipo,
@@ -223,10 +238,12 @@ export class ClientesService {
           color: prenda.color,
           valorAlquiler: prenda.valorAlquiler,
         })),
-        empleado: servicio.empleado ? {
-          id: servicio.empleado.id,
-          nombre: servicio.empleado.nombre,
-        } : null,
+        empleado: servicio.empleado
+          ? {
+              id: servicio.empleado.id,
+              nombre: servicio.empleado.nombre,
+            }
+          : null,
       })),
       totalServicios: servicios.length,
       serviciosVigentes,
@@ -240,8 +257,8 @@ export class ClientesService {
   async obtenerEstadisticas() {
     const todosClientes = await this.clienteRepository.buscarTodos(1, 10000);
 
-    const activos = todosClientes.data.filter(c => c.activo).length;
-    const inactivos = todosClientes.data.filter(c => !c.activo).length;
+    const activos = todosClientes.data.filter((c) => c.activo).length;
+    const inactivos = todosClientes.data.filter((c) => !c.activo).length;
 
     return {
       total: todosClientes.total,

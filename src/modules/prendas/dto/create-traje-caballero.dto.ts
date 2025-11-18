@@ -1,4 +1,10 @@
-import { IsBoolean, IsEnum, IsString, IsOptional, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsString,
+  IsOptional,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreatePrendaDto } from './create-prenda.dto';
 

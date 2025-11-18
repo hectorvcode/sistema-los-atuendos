@@ -38,7 +38,9 @@ export class LavanderiaRepository implements ILavanderiaRepository {
     }
   }
 
-  async buscarConFiltros(opciones: QueryLavanderiaOptions): Promise<PaginationResult<ItemLavanderia>> {
+  async buscarConFiltros(
+    opciones: QueryLavanderiaOptions,
+  ): Promise<PaginationResult<ItemLavanderia>> {
     try {
       const { pagina = 1, limite = 10, ...filtros } = opciones;
       const skip = (pagina - 1) * limite;
@@ -70,15 +72,20 @@ export class LavanderiaRepository implements ILavanderiaRepository {
       // Aplicar filtros where
       if (Object.keys(where).length > 0) {
         Object.entries(where).forEach(([key, value]) => {
-          queryBuilder = queryBuilder.andWhere(`item.${key} = :${key}`, { [key]: value });
+          queryBuilder = queryBuilder.andWhere(`item.${key} = :${key}`, {
+            [key]: value,
+          });
         });
       }
 
       // Filtro de prioridad mínima
       if (filtros.prioridadMinima !== undefined) {
-        queryBuilder = queryBuilder.andWhere('item.prioridad >= :prioridadMinima', {
-          prioridadMinima: filtros.prioridadMinima,
-        });
+        queryBuilder = queryBuilder.andWhere(
+          'item.prioridad >= :prioridadMinima',
+          {
+            prioridadMinima: filtros.prioridadMinima,
+          },
+        );
       }
 
       // Ordenar por prioridad descendente (mayor prioridad primero)
@@ -148,15 +155,23 @@ export class LavanderiaRepository implements ILavanderiaRepository {
     }
   }
 
-  async actualizar(id: number, datos: Partial<ItemLavanderia>): Promise<ItemLavanderia> {
+  async actualizar(
+    id: number,
+    datos: Partial<ItemLavanderia>,
+  ): Promise<ItemLavanderia> {
     try {
       const item = await this.buscarPorId(id);
 
       if (!item) {
-        throw new NotFoundException(`Ítem de lavandería con ID ${id} no encontrado`);
+        throw new NotFoundException(
+          `Ítem de lavandería con ID ${id} no encontrado`,
+        );
       }
 
-      await this.itemLavanderiaRepository.update({ id } as FindOptionsWhere<ItemLavanderia>, datos);
+      await this.itemLavanderiaRepository.update(
+        { id } as FindOptionsWhere<ItemLavanderia>,
+        datos,
+      );
 
       const itemActualizado = await this.buscarPorId(id);
 
@@ -173,7 +188,10 @@ export class LavanderiaRepository implements ILavanderiaRepository {
     }
   }
 
-  async actualizarMultiples(ids: number[], datos: Partial<ItemLavanderia>): Promise<void> {
+  async actualizarMultiples(
+    ids: number[],
+    datos: Partial<ItemLavanderia>,
+  ): Promise<void> {
     try {
       await this.itemLavanderiaRepository.update(
         { id: In(ids) } as FindOptionsWhere<ItemLavanderia>,
@@ -189,14 +207,20 @@ export class LavanderiaRepository implements ILavanderiaRepository {
       const item = await this.buscarPorId(id);
 
       if (!item) {
-        throw new NotFoundException(`Ítem de lavandería con ID ${id} no encontrado`);
+        throw new NotFoundException(
+          `Ítem de lavandería con ID ${id} no encontrado`,
+        );
       }
 
       const resultado = await this.itemLavanderiaRepository.delete({
         id,
       } as FindOptionsWhere<ItemLavanderia>);
 
-      return resultado.affected !== undefined && resultado.affected !== null && resultado.affected > 0;
+      return (
+        resultado.affected !== undefined &&
+        resultado.affected !== null &&
+        resultado.affected > 0
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

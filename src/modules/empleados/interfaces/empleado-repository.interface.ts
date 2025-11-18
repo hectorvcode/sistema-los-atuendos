@@ -12,10 +12,19 @@ export interface PaginationResult<T> {
 export interface IEmpleadoRepository {
   crear(empleado: Empleado): Promise<Empleado>;
   buscarPorId(id: number): Promise<Empleado | null>;
-  buscarPorIdentificacion(numeroIdentificacion: string): Promise<Empleado | null>;
+  buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Empleado | null>;
   buscarPorEmail(correoElectronico: string): Promise<Empleado | null>;
-  buscarTodos(pagina?: number, limite?: number): Promise<PaginationResult<Empleado>>;
-  buscarPorCriterios(criterios: Partial<Empleado>, pagina?: number, limite?: number): Promise<PaginationResult<Empleado>>;
+  buscarTodos(
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Empleado>>;
+  buscarPorCriterios(
+    criterios: Partial<Empleado>,
+    pagina?: number,
+    limite?: number,
+  ): Promise<PaginationResult<Empleado>>;
   actualizar(id: number, datos: Partial<Empleado>): Promise<Empleado>;
   eliminar(id: number): Promise<boolean>;
   buscarServiciosPorEmpleado(empleadoId: number): Promise<ServicioAlquiler[]>;

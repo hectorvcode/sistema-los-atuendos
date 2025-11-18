@@ -1,7 +1,16 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { EmpleadoRepository } from '../repositories/empleado.repository';
 import { Empleado } from '../entities/empleado.entity';
-import { CreateEmpleadoDto, UpdateEmpleadoDto, QueryEmpleadosDto } from '../dto';
+import {
+  CreateEmpleadoDto,
+  UpdateEmpleadoDto,
+  QueryEmpleadosDto,
+} from '../dto';
 import { PaginationResult } from '../interfaces/empleado-repository.interface';
 
 /**
@@ -9,29 +18,28 @@ import { PaginationResult } from '../interfaces/empleado-repository.interface';
  */
 @Injectable()
 export class EmpleadosService {
-  constructor(
-    private readonly empleadoRepository: EmpleadoRepository,
-  ) {}
+  constructor(private readonly empleadoRepository: EmpleadoRepository) {}
 
   async crearEmpleado(createEmpleadoDto: CreateEmpleadoDto): Promise<Empleado> {
     try {
-      const empleadoPorIdentificacion = await this.empleadoRepository.buscarPorIdentificacion(
-        createEmpleadoDto.numeroIdentificacion
-      );
+      const empleadoPorIdentificacion =
+        await this.empleadoRepository.buscarPorIdentificacion(
+          createEmpleadoDto.numeroIdentificacion,
+        );
 
       if (empleadoPorIdentificacion) {
         throw new ConflictException(
-          `Ya existe un empleado con la identificación ${createEmpleadoDto.numeroIdentificacion}`
+          `Ya existe un empleado con la identificación ${createEmpleadoDto.numeroIdentificacion}`,
         );
       }
 
       const empleadoPorEmail = await this.empleadoRepository.buscarPorEmail(
-        createEmpleadoDto.correoElectronico
+        createEmpleadoDto.correoElectronico,
       );
 
       if (empleadoPorEmail) {
         throw new ConflictException(
-          `Ya existe un empleado con el email ${createEmpleadoDto.correoElectronico}`
+          `Ya existe un empleado con el email ${createEmpleadoDto.correoElectronico}`,
         );
       }
 
@@ -48,7 +56,9 @@ export class EmpleadosService {
       if (error instanceof ConflictException) {
         throw error;
       }
-      throw new BadRequestException(`Error al crear empleado: ${error.message}`);
+      throw new BadRequestException(
+        `Error al crear empleado: ${error.message}`,
+      );
     }
   }
 
@@ -62,19 +72,26 @@ export class EmpleadosService {
     return empleado;
   }
 
-  async buscarPorIdentificacion(numeroIdentificacion: string): Promise<Empleado> {
-    const empleado = await this.empleadoRepository.buscarPorIdentificacion(numeroIdentificacion);
+  async buscarPorIdentificacion(
+    numeroIdentificacion: string,
+  ): Promise<Empleado> {
+    const empleado =
+      await this.empleadoRepository.buscarPorIdentificacion(
+        numeroIdentificacion,
+      );
 
     if (!empleado) {
       throw new NotFoundException(
-        `Empleado con identificación ${numeroIdentificacion} no encontrado`
+        `Empleado con identificación ${numeroIdentificacion} no encontrado`,
       );
     }
 
     return empleado;
   }
 
-  async buscarEmpleados(query: QueryEmpleadosDto): Promise<PaginationResult<Empleado>> {
+  async buscarEmpleados(
+    query: QueryEmpleadosDto,
+  ): Promise<PaginationResult<Empleado>> {
     const { pagina = 1, limite = 10, ...criterios } = query;
 
     if (Object.keys(criterios).length === 0) {
@@ -102,33 +119,37 @@ export class EmpleadosService {
     return await this.empleadoRepository.buscarPorCriterios(
       criteriosBusqueda,
       pagina,
-      limite
+      limite,
     );
   }
 
-  async actualizarEmpleado(id: number, updateEmpleadoDto: UpdateEmpleadoDto): Promise<Empleado> {
+  async actualizarEmpleado(
+    id: number,
+    updateEmpleadoDto: UpdateEmpleadoDto,
+  ): Promise<Empleado> {
     await this.buscarPorId(id);
 
     if (updateEmpleadoDto.numeroIdentificacion) {
-      const empleadoExistente = await this.empleadoRepository.buscarPorIdentificacion(
-        updateEmpleadoDto.numeroIdentificacion
-      );
+      const empleadoExistente =
+        await this.empleadoRepository.buscarPorIdentificacion(
+          updateEmpleadoDto.numeroIdentificacion,
+        );
 
       if (empleadoExistente && empleadoExistente.id !== id) {
         throw new ConflictException(
-          `Ya existe otro empleado con la identificación ${updateEmpleadoDto.numeroIdentificacion}`
+          `Ya existe otro empleado con la identificación ${updateEmpleadoDto.numeroIdentificacion}`,
         );
       }
     }
 
     if (updateEmpleadoDto.correoElectronico) {
       const empleadoExistente = await this.empleadoRepository.buscarPorEmail(
-        updateEmpleadoDto.correoElectronico
+        updateEmpleadoDto.correoElectronico,
       );
 
       if (empleadoExistente && empleadoExistente.id !== id) {
         throw new ConflictException(
-          `Ya existe otro empleado con el email ${updateEmpleadoDto.correoElectronico}`
+          `Ya existe otro empleado con el email ${updateEmpleadoDto.correoElectronico}`,
         );
       }
     }
@@ -147,7 +168,9 @@ export class EmpleadosService {
 
     // Convertir fechaIngreso de string a Date si está presente
     if (updateEmpleadoDto.fechaIngreso) {
-      datosActualizacion.fechaIngreso = new Date(updateEmpleadoDto.fechaIngreso);
+      datosActualizacion.fechaIngreso = new Date(
+        updateEmpleadoDto.fechaIngreso,
+      );
     }
 
     return await this.empleadoRepository.actualizar(id, datosActualizacion);
@@ -175,11 +198,12 @@ export class EmpleadosService {
   async obtenerServiciosEmpleado(empleadoId: number) {
     const empleado = await this.buscarPorId(empleadoId);
 
-    const servicios = await this.empleadoRepository.buscarServiciosPorEmpleado(empleadoId);
+    const servicios =
+      await this.empleadoRepository.buscarServiciosPorEmpleado(empleadoId);
 
     const totalValor = servicios.reduce(
       (sum, servicio) => sum + Number(servicio.valorTotal),
-      0
+      0,
     );
 
     return {
@@ -189,17 +213,19 @@ export class EmpleadosService {
         numeroIdentificacion: empleado.numeroIdentificacion,
         cargo: empleado.cargo,
       },
-      servicios: servicios.map(servicio => ({
+      servicios: servicios.map((servicio) => ({
         id: servicio.id,
         numero: servicio.numero,
         fechaAlquiler: servicio.fechaAlquiler,
         fechaDevolucion: servicio.fechaDevolucion,
         estado: servicio.estado,
         valorTotal: servicio.valorTotal,
-        cliente: servicio.cliente ? {
-          id: servicio.cliente.id,
-          nombre: servicio.cliente.nombre,
-        } : null,
+        cliente: servicio.cliente
+          ? {
+              id: servicio.cliente.id,
+              nombre: servicio.cliente.nombre,
+            }
+          : null,
         cantidadPrendas: servicio.prendas?.length || 0,
       })),
       totalServicios: servicios.length,
@@ -210,14 +236,17 @@ export class EmpleadosService {
   async obtenerEstadisticas() {
     const todosEmpleados = await this.empleadoRepository.buscarTodos(1, 10000);
 
-    const activos = todosEmpleados.data.filter(e => e.activo).length;
-    const inactivos = todosEmpleados.data.filter(e => !e.activo).length;
+    const activos = todosEmpleados.data.filter((e) => e.activo).length;
+    const inactivos = todosEmpleados.data.filter((e) => !e.activo).length;
 
     // Agrupar por cargo
-    const porCargo = todosEmpleados.data.reduce((acc, empleado) => {
-      acc[empleado.cargo] = (acc[empleado.cargo] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const porCargo = todosEmpleados.data.reduce(
+      (acc, empleado) => {
+        acc[empleado.cargo] = (acc[empleado.cargo] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       total: todosEmpleados.total,

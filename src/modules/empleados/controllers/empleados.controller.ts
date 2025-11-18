@@ -13,14 +13,13 @@ import {
   ValidationPipe,
   ParseIntPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { EmpleadosService } from '../services/empleados.service';
-import { CreateEmpleadoDto, UpdateEmpleadoDto, QueryEmpleadosDto } from '../dto';
+import {
+  CreateEmpleadoDto,
+  UpdateEmpleadoDto,
+  QueryEmpleadosDto,
+} from '../dto';
 import { Empleado } from '../entities/empleado.entity';
 
 /**
@@ -35,11 +34,19 @@ export class EmpleadosController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nuevo empleado',
-    description: 'Registra un nuevo empleado en el sistema con validación de datos únicos',
+    description:
+      'Registra un nuevo empleado en el sistema con validación de datos únicos',
   })
-  @ApiResponse({ status: 201, description: 'Empleado creado exitosamente', type: Empleado })
+  @ApiResponse({
+    status: 201,
+    description: 'Empleado creado exitosamente',
+    type: Empleado,
+  })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  @ApiResponse({ status: 409, description: 'Ya existe un empleado con esa identificación o email' })
+  @ApiResponse({
+    status: 409,
+    description: 'Ya existe un empleado con esa identificación o email',
+  })
   async crearEmpleado(
     @Body(new ValidationPipe({ transform: true, whitelist: true }))
     createEmpleadoDto: CreateEmpleadoDto,
@@ -51,9 +58,13 @@ export class EmpleadosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consultar empleados',
-    description: 'Obtiene un listado de empleados con filtros opcionales y paginación',
+    description:
+      'Obtiene un listado de empleados con filtros opcionales y paginación',
   })
-  @ApiResponse({ status: 200, description: 'Lista de empleados obtenida exitosamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de empleados obtenida exitosamente',
+  })
   async buscarEmpleados(
     @Query(new ValidationPipe({ transform: true }))
     query: QueryEmpleadosDto,
@@ -65,9 +76,13 @@ export class EmpleadosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener estadísticas de empleados',
-    description: 'Obtiene estadísticas generales sobre los empleados en el sistema',
+    description:
+      'Obtiene estadísticas generales sobre los empleados en el sistema',
   })
-  @ApiResponse({ status: 200, description: 'Estadísticas obtenidas exitosamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Estadísticas obtenidas exitosamente',
+  })
   async obtenerEstadisticas() {
     return await this.empleadosService.obtenerEstadisticas();
   }
@@ -79,7 +94,11 @@ export class EmpleadosController {
     description: 'Obtiene un empleado específico por su ID',
   })
   @ApiParam({ name: 'id', description: 'ID del empleado', example: 1 })
-  @ApiResponse({ status: 200, description: 'Empleado encontrado', type: Empleado })
+  @ApiResponse({
+    status: 200,
+    description: 'Empleado encontrado',
+    type: Empleado,
+  })
   @ApiResponse({ status: 404, description: 'Empleado no encontrado' })
   async buscarPorId(@Param('id', ParseIntPipe) id: number): Promise<Empleado> {
     return await this.empleadosService.buscarPorId(id);
@@ -89,10 +108,14 @@ export class EmpleadosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener servicios gestionados por el empleado',
-    description: 'Obtiene todos los servicios de alquiler que el empleado ha gestionado',
+    description:
+      'Obtiene todos los servicios de alquiler que el empleado ha gestionado',
   })
   @ApiParam({ name: 'id', description: 'ID del empleado', example: 1 })
-  @ApiResponse({ status: 200, description: 'Servicios del empleado obtenidos exitosamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Servicios del empleado obtenidos exitosamente',
+  })
   @ApiResponse({ status: 404, description: 'Empleado no encontrado' })
   async obtenerServiciosEmpleado(@Param('id', ParseIntPipe) id: number) {
     return await this.empleadosService.obtenerServiciosEmpleado(id);
@@ -102,15 +125,26 @@ export class EmpleadosController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar empleado por número de identificación',
-    description: 'Obtiene un empleado específico por su número de identificación',
+    description:
+      'Obtiene un empleado específico por su número de identificación',
   })
-  @ApiParam({ name: 'numeroIdentificacion', description: 'Número de identificación', example: '9876543210' })
-  @ApiResponse({ status: 200, description: 'Empleado encontrado', type: Empleado })
+  @ApiParam({
+    name: 'numeroIdentificacion',
+    description: 'Número de identificación',
+    example: '9876543210',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Empleado encontrado',
+    type: Empleado,
+  })
   @ApiResponse({ status: 404, description: 'Empleado no encontrado' })
   async buscarPorIdentificacion(
     @Param('numeroIdentificacion') numeroIdentificacion: string,
   ): Promise<Empleado> {
-    return await this.empleadosService.buscarPorIdentificacion(numeroIdentificacion);
+    return await this.empleadosService.buscarPorIdentificacion(
+      numeroIdentificacion,
+    );
   }
 
   @Put(':id')
@@ -120,7 +154,11 @@ export class EmpleadosController {
     description: 'Actualiza los datos de un empleado existente',
   })
   @ApiParam({ name: 'id', description: 'ID del empleado', example: 1 })
-  @ApiResponse({ status: 200, description: 'Empleado actualizado exitosamente', type: Empleado })
+  @ApiResponse({
+    status: 200,
+    description: 'Empleado actualizado exitosamente',
+    type: Empleado,
+  })
   @ApiResponse({ status: 404, description: 'Empleado no encontrado' })
   @ApiResponse({ status: 409, description: 'Conflicto con datos únicos' })
   async actualizarEmpleado(
@@ -128,7 +166,10 @@ export class EmpleadosController {
     @Body(new ValidationPipe({ transform: true, whitelist: true }))
     updateEmpleadoDto: UpdateEmpleadoDto,
   ): Promise<Empleado> {
-    return await this.empleadosService.actualizarEmpleado(id, updateEmpleadoDto);
+    return await this.empleadosService.actualizarEmpleado(
+      id,
+      updateEmpleadoDto,
+    );
   }
 
   @Patch(':id/desactivar')
@@ -138,9 +179,14 @@ export class EmpleadosController {
     description: 'Marca un empleado como inactivo (soft delete)',
   })
   @ApiParam({ name: 'id', description: 'ID del empleado', example: 1 })
-  @ApiResponse({ status: 200, description: 'Empleado desactivado exitosamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Empleado desactivado exitosamente',
+  })
   @ApiResponse({ status: 404, description: 'Empleado no encontrado' })
-  async desactivarEmpleado(@Param('id', ParseIntPipe) id: number): Promise<Empleado> {
+  async desactivarEmpleado(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Empleado> {
     return await this.empleadosService.desactivarEmpleado(id);
   }
 

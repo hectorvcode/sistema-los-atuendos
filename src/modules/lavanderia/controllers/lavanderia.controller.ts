@@ -13,12 +13,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { LavanderiaService } from '../services/lavanderia.service';
 import {
   CreateItemLavanderiaDto,
@@ -154,7 +149,8 @@ export class LavanderiaController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Buscar ítem por ID',
-    description: 'Obtiene un ítem específico por su ID con información completa de la prenda',
+    description:
+      'Obtiene un ítem específico por su ID con información completa de la prenda',
   })
   @ApiParam({
     name: 'id',
@@ -170,7 +166,9 @@ export class LavanderiaController {
     status: 404,
     description: 'Ítem no encontrado',
   })
-  async buscarPorId(@Param('id', ParseIntPipe) id: number): Promise<ItemLavanderia> {
+  async buscarPorId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ItemLavanderia> {
     return await this.lavanderiaService.buscarPorId(id);
   }
 
@@ -181,7 +179,8 @@ export class LavanderiaController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Actualizar estado de ítem',
-    description: 'Actualiza el estado de un ítem de lavandería (pendiente, enviado, en_proceso, completado)',
+    description:
+      'Actualiza el estado de un ítem de lavandería (pendiente, enviado, en_proceso, completado)',
   })
   @ApiParam({
     name: 'id',

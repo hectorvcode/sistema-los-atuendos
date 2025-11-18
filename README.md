@@ -5,11 +5,9 @@ API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (v
 ## Características Principales
 
 - **Patrones de Diseño Implementados:**
-  - Factory Method (creación de prendas)
-  - Builder (servicios de alquiler)
-  - Singleton (generación de consecutivos)
-  - Decorator (cálculo dinámico de prioridades)
-  - Repository (persistencia de datos)
+  - **Creacionales**: Factory Method, Builder, Singleton
+  - **Estructurales**: Decorator, Repository, Adapter, Composite, Facade
+  - **Comportamiento**: State (gestión de ciclo de vida de servicios)
 
 - **Módulos:**
   - Gestión de Prendas (vestidos, trajes, disfraces)
@@ -147,7 +145,8 @@ los-atuendos/
 │   │   └── servicios/
 │   ├── patterns/            # Implementación de patrones de diseño
 │   │   ├── creational/      # Factory, Builder, Singleton
-│   │   └── structural/      # Decorator, Repository
+│   │   ├── structural/      # Decorator, Repository, Adapter, Composite, Facade
+│   │   └── behavioral/      # State (gestión de estados)
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
@@ -185,6 +184,12 @@ Calcula dinámicamente la prioridad de items de lavandería.
 Ubicación: `src/patterns/structural/repository/`
 
 Abstrae la lógica de acceso a datos.
+
+### State Pattern
+
+Ubicación: `src/patterns/behavioral/state/`
+
+Gestiona el ciclo de vida de los servicios de alquiler mediante estados bien definidos (Pendiente, Confirmado, Entregado, Devuelto, Cancelado), validando automáticamente las transiciones permitidas.
 
 ## Solución de Problemas
 

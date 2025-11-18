@@ -43,6 +43,7 @@ Este documento describe la estrategia de testing implementada en el proyecto Los
 - Adapter Pattern (Abstracción de repositorios)
 - Composite Pattern (Gestión de conjuntos)
 - Facade Pattern (Simplificación de operaciones)
+- State Pattern (Gestión de estados de servicios)
 
 ---
 
@@ -66,11 +67,13 @@ los-atuendos/
 │   │   │       ├── factory.spec.ts
 │   │   │       ├── builder.spec.ts
 │   │   │       └── singleton.spec.ts
-│   │   └── structural/
-│   │       ├── adapter/test/adapter.spec.ts
-│   │       ├── decorator/test/decorator.spec.ts
-│   │       ├── composite/test/composite.spec.ts
-│   │       └── facade/test/facade.spec.ts
+│   │   ├── structural/
+│   │   │   ├── adapter/test/adapter.spec.ts
+│   │   │   ├── decorator/test/decorator.spec.ts
+│   │   │   ├── composite/test/composite.spec.ts
+│   │   │   └── facade/test/facade.spec.ts
+│   │   └── behavioral/
+│   │       └── state/test/servicio-state.spec.ts
 │   └── modules/
 │       ├── prendas/test/
 │       ├── clientes/test/
@@ -185,6 +188,56 @@ npm run test:decorator
 - Prioridad base + incrementos por características
 - Mancha, delicada y urgente modifican prioridad
 
+#### State Pattern
+
+```bash
+npm run test -- servicio-state.spec
+```
+
+**Valida**:
+
+- Transiciones de estado válidas e inválidas
+- Validaciones de reglas de negocio por estado
+- Permisos de modificación y eliminación según estado
+- Flujos completos de ciclo de vida del servicio
+- Obtención de información de estado y transiciones permitidas
+
+**Estados Validados**:
+
+- **Pendiente**: Permite confirmar o cancelar
+- **Confirmado**: Permite entregar (con validación de fechas) o cancelar
+- **Entregado**: Solo permite devolver, no se puede cancelar
+- **Devuelto**: Estado terminal, no permite transiciones
+- **Cancelado**: Estado terminal, permite eliminación
+
+**Ejemplo de Test**:
+
+```typescript
+it('debe completar el flujo exitoso: pendiente → confirmado → entregado → devuelto', async () => {
+  // Pendiente → Confirmado
+  expect(servicio.estado).toBe('pendiente');
+  await stateContext.confirmar(servicio);
+  expect(servicio.estado).toBe('confirmado');
+
+  // Confirmado → Entregado
+  servicio.fechaAlquiler = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  await stateContext.entregar(servicio);
+  expect(servicio.estado).toBe('entregado');
+
+  // Entregado → Devuelto
+  await stateContext.devolver(servicio);
+  expect(servicio.estado).toBe('devuelto');
+  expect(servicio.fechaDevolucion).toBeDefined();
+});
+```
+
+**Tests Implementados**: 37 tests
+
+- 14 tests para validación de transiciones
+- 10 tests para permisos (modificar/eliminar)
+- 10 tests para obtener transiciones permitidas
+- 3 tests para flujos completos del ciclo de vida
+
 ---
 
 ## Comandos de Testing
@@ -225,6 +278,9 @@ npm run test:decorator      # Decorator
 npm run test:adapter        # Adapter
 npm run test:composite      # Composite
 npm run test:facade         # Facade
+
+# Patrones de Comportamiento
+npm run test -- servicio-state.spec  # State Pattern
 
 # Todos los patrones
 npm run test:patterns
@@ -340,6 +396,9 @@ npm run db:reset
 
 ### Estadísticas
 
-- **Tests Unitarios**: 140+ tests
+- **Tests Unitarios**: 177+ tests (incluye 37 tests de State Pattern)
 - **Cobertura Total**: ~85%
-- **Patrones Validados**: 7 patrones de diseño
+- **Patrones Validados**: 8 patrones de diseño
+  - **Creacionales**: Factory Method, Builder, Singleton
+  - **Estructurales**: Decorator, Adapter, Composite, Facade
+  - **Comportamiento**: State

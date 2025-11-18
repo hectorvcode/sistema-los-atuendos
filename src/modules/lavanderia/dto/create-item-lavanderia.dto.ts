@@ -1,4 +1,9 @@
-import { IsNumber, IsOptional, IsBoolean, ValidateNested } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsBoolean,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -29,7 +34,11 @@ export class ConfiguracionesDecoradorDto {
 
   @ApiPropertyOptional({
     description: 'Configuración de prioridad administrativa',
-    example: { nivel: 'urgente', razon: 'evento importante', solicitadoPor: 'Gerencia' },
+    example: {
+      nivel: 'urgente',
+      razon: 'evento importante',
+      solicitadoPor: 'Gerencia',
+    },
   })
   @IsOptional()
   administrativa?: {

@@ -1,9 +1,17 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrendaFactoryRegistry } from '../../../patterns/creational/factory/prenda-factory.registry';
 import { PrendaRepository } from '../repositories/prenda.repository';
 import { Prenda } from '../entities/prenda.entity';
 import { CreatePrendaDto, QueryPrendasDto, OrdenPrendas } from '../dto';
-import { PaginationResult, PrendasAgrupadasPorTipo } from '../interfaces/prenda-repository.interface';
+import {
+  PaginationResult,
+  PrendasAgrupadasPorTipo,
+} from '../interfaces/prenda-repository.interface';
 import { PrendaBaseData } from '../../../patterns/creational/factory/prenda-factory.interface';
 
 /**
@@ -26,18 +34,18 @@ export class PrendasService {
       const tiposDisponibles = this.prendaFactory.getTiposDisponibles();
       if (!tiposDisponibles.includes(createPrendaDto.tipo.toLowerCase())) {
         throw new BadRequestException(
-          `Tipo de prenda inválido. Tipos disponibles: ${tiposDisponibles.join(', ')}`
+          `Tipo de prenda inválido. Tipos disponibles: ${tiposDisponibles.join(', ')}`,
         );
       }
 
       // Verificar que la referencia no exista
       const prendaExistente = await this.prendaRepository.buscarPorReferencia(
-        createPrendaDto.referencia
+        createPrendaDto.referencia,
       );
 
       if (prendaExistente) {
         throw new ConflictException(
-          `Ya existe una prenda con la referencia ${createPrendaDto.referencia}`
+          `Ya existe una prenda con la referencia ${createPrendaDto.referencia}`,
         );
       }
 
@@ -54,7 +62,7 @@ export class PrendasService {
       // Usar Factory Method para crear la prenda según su tipo (ya persiste)
       const prenda = await this.prendaFactory.crearPrenda(
         createPrendaDto.tipo,
-        datosBase
+        datosBase,
       );
 
       // Establecer propiedades adicionales si están presentes y guardar cambios si aplican
@@ -64,7 +72,10 @@ export class PrendasService {
         necesitaGuardar = true;
       }
 
-      if (createPrendaDto.disponible !== undefined && prenda.disponible !== createPrendaDto.disponible) {
+      if (
+        createPrendaDto.disponible !== undefined &&
+        prenda.disponible !== createPrendaDto.disponible
+      ) {
         prenda.disponible = createPrendaDto.disponible;
         necesitaGuardar = true;
       }
@@ -76,7 +87,10 @@ export class PrendasService {
       // Evitar doble inserción (factory ya hizo save)
       return prenda;
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof ConflictException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
         throw error;
       }
       throw new BadRequestException(`Error al crear prenda: ${error.message}`);
@@ -90,7 +104,9 @@ export class PrendasService {
     const prenda = await this.prendaRepository.buscarPorReferencia(referencia);
 
     if (!prenda) {
-      throw new NotFoundException(`Prenda con referencia ${referencia} no encontrada`);
+      throw new NotFoundException(
+        `Prenda con referencia ${referencia} no encontrada`,
+      );
     }
 
     return prenda;
@@ -99,7 +115,9 @@ export class PrendasService {
   /**
    * Busca prendas con filtros y paginación
    */
-  async buscarPrendas(query: QueryPrendasDto): Promise<PaginationResult<Prenda>> {
+  async buscarPrendas(
+    query: QueryPrendasDto,
+  ): Promise<PaginationResult<Prenda>> {
     const { pagina = 1, limite = 10, orden, ...criterios } = query;
 
     // Construir criterios de búsqueda dinámicos
@@ -125,14 +143,16 @@ export class PrendasService {
     return await this.prendaRepository.buscarPorCriterios(
       criteriosBusqueda,
       pagina,
-      limite
+      limite,
     );
   }
 
   /**
    * Busca prendas por talla y las agrupa por tipo
    */
-  async buscarPorTallaAgrupadoPorTipo(talla: string): Promise<PrendasAgrupadasPorTipo[]> {
+  async buscarPorTallaAgrupadoPorTipo(
+    talla: string,
+  ): Promise<PrendasAgrupadasPorTipo[]> {
     if (!talla || talla.trim() === '') {
       throw new BadRequestException('La talla es requerida');
     }
@@ -146,7 +166,7 @@ export class PrendasService {
   async buscarPorTalla(
     talla: string,
     pagina: number = 1,
-    limite: number = 10
+    limite: number = 10,
   ): Promise<PaginationResult<Prenda>> {
     if (!talla || talla.trim() === '') {
       throw new BadRequestException('La talla es requerida');
@@ -160,7 +180,7 @@ export class PrendasService {
    */
   async actualizarPrenda(
     referencia: string,
-    datos: Partial<CreatePrendaDto>
+    datos: Partial<CreatePrendaDto>,
   ): Promise<Prenda> {
     // Verificar que la prenda existe
     await this.buscarPorReferencia(referencia);
@@ -168,17 +188,20 @@ export class PrendasService {
     // Si se intenta cambiar la referencia, validar que no exista
     if (datos.referencia && datos.referencia !== referencia) {
       const prendaExistente = await this.prendaRepository.buscarPorReferencia(
-        datos.referencia
+        datos.referencia,
       );
 
       if (prendaExistente) {
         throw new ConflictException(
-          `Ya existe una prenda con la referencia ${datos.referencia}`
+          `Ya existe una prenda con la referencia ${datos.referencia}`,
         );
       }
     }
 
-    return await this.prendaRepository.actualizar(referencia, datos as Partial<Prenda>);
+    return await this.prendaRepository.actualizar(
+      referencia,
+      datos as Partial<Prenda>,
+    );
   }
 
   /**
@@ -213,14 +236,15 @@ export class PrendasService {
 
     const estadisticas = {
       total: todasPrendas.total,
-      disponibles: todasPrendas.data.filter(p => p.disponible).length,
-      alquiladas: todasPrendas.data.filter(p => p.estado === 'alquilada').length,
+      disponibles: todasPrendas.data.filter((p) => p.disponible).length,
+      alquiladas: todasPrendas.data.filter((p) => p.estado === 'alquilada')
+        .length,
       porTipo: {} as Record<string, number>,
       porTalla: {} as Record<string, number>,
     };
 
     // Agrupar por tipo
-    todasPrendas.data.forEach(prenda => {
+    todasPrendas.data.forEach((prenda) => {
       const tipo = (prenda as any).tipo || 'Sin tipo';
       estadisticas.porTipo[tipo] = (estadisticas.porTipo[tipo] || 0) + 1;
 

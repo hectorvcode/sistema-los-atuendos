@@ -607,7 +607,9 @@ export class CompleteDataSeed {
         fechaAlquiler: en5Dias,
         diasAlquiler: 4,
         valorTotal:
-          (this.vestidosDama[0].valorAlquiler + this.vestidosDama[1].valorAlquiler) * 4,
+          (this.vestidosDama[0].valorAlquiler +
+            this.vestidosDama[1].valorAlquiler) *
+          4,
         estado: 'reservado',
         observaciones: 'Quinceañero - Reserva anticipada',
       },
@@ -618,7 +620,8 @@ export class CompleteDataSeed {
         numeroServicio: 'ALQ-0005',
         fechaAlquiler: en10Dias,
         diasAlquiler: 2,
-        valorTotal: (this.trajes[0].valorAlquiler + this.trajes[1].valorAlquiler) * 2,
+        valorTotal:
+          (this.trajes[0].valorAlquiler + this.trajes[1].valorAlquiler) * 2,
         estado: 'reservado',
         observaciones: 'Evento corporativo - Dos ejecutivos',
       },
@@ -676,7 +679,9 @@ export class CompleteDataSeed {
           },
           urgente: {
             motivo: 'Evento VIP mañana',
-            fechaLimite: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            fechaLimite: new Date(
+              Date.now() + 24 * 60 * 60 * 1000,
+            ).toISOString(),
           },
         }),
       },
@@ -731,7 +736,9 @@ export class CompleteDataSeed {
           },
           urgente: {
             motivo: 'Boda en 3 días',
-            fechaLimite: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+            fechaLimite: new Date(
+              Date.now() + 3 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
           },
         }),
       },
@@ -767,7 +774,9 @@ export class CompleteDataSeed {
     console.log(`   🤵 Trajes de Caballero:    ${this.trajes.length}`);
     console.log(`   🎭 Disfraces:              ${this.disfraces.length}`);
     console.log('═══════════════════════════════════════');
-    console.log(`   TOTAL PRENDAS:             ${this.vestidosDama.length + this.trajes.length + this.disfraces.length}`);
+    console.log(
+      `   TOTAL PRENDAS:             ${this.vestidosDama.length + this.trajes.length + this.disfraces.length}`,
+    );
     console.log('═══════════════════════════════════════');
     console.log('\n💡 Nota: Los servicios y lavandería deben crearse');
     console.log('   a través de la API REST para respetar los');

@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ClientesService } from '../services/clientes.service';
 import { ClienteRepository } from '../repositories/cliente.repository';
 import { CreateClienteDto } from '../dto';
@@ -63,8 +67,12 @@ describe('ClientesService', () => {
       const resultado = await service.crearCliente(createDto);
 
       expect(resultado).toBeDefined();
-      expect(mockClienteRepository.buscarPorIdentificacion).toHaveBeenCalledWith('1234567890');
-      expect(mockClienteRepository.buscarPorEmail).toHaveBeenCalledWith('juan@email.com');
+      expect(
+        mockClienteRepository.buscarPorIdentificacion,
+      ).toHaveBeenCalledWith('1234567890');
+      expect(mockClienteRepository.buscarPorEmail).toHaveBeenCalledWith(
+        'juan@email.com',
+      );
       expect(mockClienteRepository.crear).toHaveBeenCalled();
     });
 
@@ -80,9 +88,13 @@ describe('ClientesService', () => {
       const clienteExistente = new Cliente();
       clienteExistente.numeroIdentificacion = '1234567890';
 
-      mockClienteRepository.buscarPorIdentificacion.mockResolvedValue(clienteExistente);
+      mockClienteRepository.buscarPorIdentificacion.mockResolvedValue(
+        clienteExistente,
+      );
 
-      await expect(service.crearCliente(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.crearCliente(createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('debería lanzar ConflictException si el email ya existe', async () => {
@@ -100,7 +112,9 @@ describe('ClientesService', () => {
       mockClienteRepository.buscarPorIdentificacion.mockResolvedValue(null);
       mockClienteRepository.buscarPorEmail.mockResolvedValue(clienteExistente);
 
-      await expect(service.crearCliente(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.crearCliente(createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -144,7 +158,9 @@ describe('ClientesService', () => {
     it('debería lanzar NotFoundException si el cliente no existe', async () => {
       mockClienteRepository.buscarPorId.mockResolvedValue(null);
 
-      await expect(service.eliminarCliente(999)).rejects.toThrow(NotFoundException);
+      await expect(service.eliminarCliente(999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
