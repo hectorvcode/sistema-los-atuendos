@@ -663,6 +663,137 @@ const info = stateContext.obtenerInformacionEstado(servicio);
 
 ---
 
+## Strategy Pattern
+
+**Ubicación**: `src/patterns/behavioral/strategy/`
+
+**Propósito**: Permitir el cálculo flexible de precios de alquiler mediante estrategias intercambiables que se seleccionan automáticamente según el contexto (tipo de cliente, temporada, cantidad de prendas, promociones activas).
+
+**Implementación**:
+
+El patrón permite que el algoritmo de cálculo de precio varíe independientemente de los clientes que lo utilizan. El sistema selecciona automáticamente la mejor estrategia aplicable según prioridad.
+
+**Diagrama de Prioridad de Estrategias**:
+
+```
+         Contexto de Pricing
+                │
+                ├── 1. Promotional? ──► Si: Aplicar (Prioridad 1)
+                ├── 2. VIP?         ──► Si: Aplicar (Prioridad 2)
+                ├── 3. Bulk?        ──► Si: Aplicar (Prioridad 3)
+                ├── 4. Seasonal?    ──► Si: Aplicar (Prioridad 4)
+                └── 5. Regular      ──► Default (Prioridad 5)
+```
+
+**Componentes**:
+
+1. **Interfaces**:
+   - `IPricingStrategy`: Contrato común para todas las estrategias
+   - `PricingContext`: Contexto con información para el cálculo (prendas, cliente, fecha)
+   - `PricingResult`: Resultado con precio base, descuento y precio final
+
+2. **Clase Base**:
+   - `AbstractPricingStrategy`: Implementación base con métodos helper
+
+3. **Estrategias Concretas** (5):
+   - `RegularPricingStrategy`: Precio base sin descuentos
+   - `VipPricingStrategy`: 15% descuento para clientes VIP
+   - `SeasonalPricingStrategy`: Descuentos por temporada
+   - `BulkPricingStrategy`: Descuentos por cantidad de prendas
+   - `PromotionalPricingStrategy`: Promociones especiales por fechas
+
+4. **Gestor**:
+   - `PricingStrategyContext`: Coordina y selecciona la mejor estrategia
+
+**Tabla de Estrategias**:
+
+| Estrategia   | Condición                          | Descuento      | Prioridad |
+|--------------|------------------------------------|----------------|-----------|
+| Promotional  | Fecha en periodo promocional       | 15% - 25%      | 1 (Alta)  |
+| VIP          | Cliente con email @vip.com         | 15%            | 2         |
+| Bulk         | 3+ prendas alquiladas              | 5% - 15%       | 3         |
+| Seasonal     | Según mes del año                  | 0% - 10%       | 4         |
+| Regular      | Siempre aplicable                  | 0%             | 5 (Baja)  |
+
+**Detalle de Estrategias**:
+
+**1. RegularPricingStrategy**
+- Precio = Suma(valorAlquiler de cada prenda)
+- Sin descuentos
+- Siempre aplicable (fallback)
+
+**2. VipPricingStrategy**
+- Descuento: 15%
+- Condición: Email del cliente termina en @vip.com, @premium.com o @platinum.com
+- Ejemplo: Cliente con email juan@vip.com recibe 15% descuento automáticamente
+
+**3. SeasonalPricingStrategy**
+- **Temporada Alta** (Dic, Ene, Jun, Jul): 0% descuento
+- **Temporada Media** (Mar, Abr, May, Sep, Oct, Nov): 5% descuento
+- **Temporada Baja** (Feb, Ago): 10% descuento
+
+**4. BulkPricingStrategy**
+- **1-2 prendas**: 0% descuento (nivel Básico)
+- **3-5 prendas**: 5% descuento (nivel Medio)
+- **6-10 prendas**: 10% descuento (nivel Alto)
+- **11+ prendas**: 15% descuento (nivel Premium)
+
+**5. PromotionalPricingStrategy**
+- **San Valentín** (10-16 Feb): 20% descuento
+- **Día de la Madre** (1-15 Mayo): 15% descuento
+- **Black Friday** (20-27 Nov): 25% descuento
+- **Navidad** (15-26 Dic): 20% descuento
+
+**Integración con Builder Pattern**:
+
+El `ServicioAlquilerBuilder` utiliza automáticamente el Strategy Pattern en el método `calcularValorTotal()`:
+
+```typescript
+// Selección automática de mejor estrategia
+const resultado = pricingContext.calcularMejorPrecio({
+  prendas,
+  cliente,
+  fechaAlquiler
+});
+
+// O selección manual de estrategia específica
+builder.setEstrategiaPrecio(vipStrategy);
+```
+
+**Beneficios**:
+
+- Algoritmos de pricing intercambiables en tiempo de ejecución
+- Fácil agregar nuevas estrategias sin modificar código existente
+- Selección automática de mejor precio para el cliente
+- Cada estrategia es testeable independientemente
+- Cumple Open/Closed Principle
+- Evita condicionales complejos en cálculo de precios
+
+**Ejemplo de Uso**:
+
+```typescript
+// Caso 1: Cliente VIP alquila 6 prendas en Black Friday
+// Resultado: Aplica Promotional (25%) - prioridad más alta
+const resultado = pricingContext.calcularMejorPrecio({
+  prendas: [prenda1, prenda2, prenda3, prenda4, prenda5, prenda6],
+  cliente: { correoElectronico: 'cliente@vip.com' },
+  fechaAlquiler: new Date(2024, 10, 25) // 25 Nov
+});
+// precioBase: 600000, descuento: 150000, precioFinal: 450000
+
+// Caso 2: Cliente normal alquila 3 prendas fuera de promociones
+// Resultado: Aplica Bulk (5%)
+const resultado2 = pricingContext.calcularMejorPrecio({
+  prendas: [prenda1, prenda2, prenda3],
+  fechaAlquiler: new Date(2024, 8, 15) // 15 Sep
+});
+// precioBase: 300000, descuento: 15000, precioFinal: 285000
+```
+
+**Tests**: 36 tests unitarios cubriendo todas las estrategias y escenarios de combinación.
+
+---
+
 ## Módulos del Sistema
 
 ### 1. Módulo de Prendas
@@ -731,6 +862,7 @@ const info = stateContext.obtenerInformacionEstado(servicio);
 - **Builder**: `ServicioAlquilerBuilder`
 - **Singleton**: `GeneradorConsecutivo`
 - **State Pattern**: Gestión del ciclo de vida
+- **Strategy Pattern**: Cálculo flexible de precios
 
 **Funcionalidades**:
 
@@ -743,7 +875,10 @@ const info = stateContext.obtenerInformacionEstado(servicio);
   - Cancelar servicio (→ cancelado)
   - Validaciones automáticas de transiciones
   - Consultar estado y transiciones permitidas
-- Cálculo de valor total
+- Cálculo dinámico de precios (Strategy Pattern):
+  - Selección automática de mejor estrategia
+  - Descuentos por cliente VIP, temporada, cantidad y promociones
+  - Precio base sin descuentos como fallback
 - Control de fechas y disponibilidad
 - Estadísticas de servicios
 
@@ -799,7 +934,7 @@ const info = stateContext.obtenerInformacionEstado(servicio);
 ┌─────────┐     ┌──────────┐     ┌─────────┐     ┌──────────┐
 │ Cliente │────▶│Controller│────▶│ Service │────▶│ Builder  │
 │  HTTP   │     │          │     │         │     │          │
-└─────────┘     └──────────┘     └─────────┘     └────┬─────┘
+└──────���──┘     └──────────┘     └─────────┘     └────┬─────┘
                                                        │
     1. POST /api/servicios                             │
     {                                                  │

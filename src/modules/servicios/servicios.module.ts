@@ -17,6 +17,15 @@ import {
   ReturnedState,
   CancelledState,
 } from '../../patterns/behavioral/state';
+// Strategy Pattern imports
+import {
+  PricingStrategyContext,
+  RegularPricingStrategy,
+  VipPricingStrategy,
+  SeasonalPricingStrategy,
+  BulkPricingStrategy,
+  PromotionalPricingStrategy,
+} from '../../patterns/behavioral/strategy';
 
 /**
  * ServiciosModule - Módulo de gestión de servicios de alquiler
@@ -25,6 +34,7 @@ import {
  * - Singleton Pattern para generación de consecutivos
  * - Repository Pattern para abstracción de persistencia
  * - State Pattern para gestión del ciclo de vida del servicio
+ * - Strategy Pattern para cálculo flexible de precios
  */
 @Module({
   imports: [
@@ -43,7 +53,19 @@ import {
     DeliveredState,
     ReturnedState,
     CancelledState,
+    // Strategy Pattern providers
+    PricingStrategyContext,
+    RegularPricingStrategy,
+    VipPricingStrategy,
+    SeasonalPricingStrategy,
+    BulkPricingStrategy,
+    PromotionalPricingStrategy,
   ],
-  exports: [ServiciosService, ServicioRepository, ServicioStateContext],
+  exports: [
+    ServiciosService,
+    ServicioRepository,
+    ServicioStateContext,
+    PricingStrategyContext,
+  ],
 })
 export class ServiciosModule {}

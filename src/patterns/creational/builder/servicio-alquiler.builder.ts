@@ -7,11 +7,14 @@ import { Cliente } from '../../../modules/clientes/entities/cliente.entity';
 import { Empleado } from '../../../modules/empleados/entities/empleado.entity';
 import { Prenda } from '../../../modules/prendas/entities/prenda.entity';
 import { GeneradorConsecutivo } from '../singleton/generador-consecutivo.singleton';
+import { PricingStrategyContext } from '../../behavioral/strategy/pricing-context';
+import { IPricingStrategy } from '../../behavioral/strategy/pricing-strategy.interface';
 
 @Injectable()
 export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
   private servicio: Partial<ServicioAlquiler> = {};
   private prendasSeleccionadas: Prenda[] = [];
+  private estrategiaPrecio: IPricingStrategy | null = null;
 
   constructor(
     @InjectRepository(ServicioAlquiler)
@@ -23,6 +26,7 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
     @InjectRepository(Prenda)
     private readonly prendaRepository: Repository<Prenda>,
     private readonly generadorConsecutivo: GeneradorConsecutivo,
+    private readonly pricingContext: PricingStrategyContext,
   ) {
     this.reset();
   }
@@ -69,6 +73,16 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
     return this;
   }
 
+  /**
+   * Establece una estrategia de pricing específica
+   * Si no se establece, se usará la mejor estrategia automáticamente
+   * @param estrategia - Estrategia de pricing a usar
+   */
+  setEstrategiaPrecio(estrategia: IPricingStrategy): IServicioAlquilerBuilder {
+    this.estrategiaPrecio = estrategia;
+    return this;
+  }
+
   async build(): Promise<ServicioAlquiler> {
     try {
       // Validaciones antes de construir
@@ -84,8 +98,8 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
       const empleadoCompleto: Empleado = await this.cargarEmpleado();
       const prendasCompletas: Prenda[] = await this.cargarPrendas();
 
-      // Calcular valor total
-      const valorTotal: number = this.calcularValorTotal(prendasCompletas);
+      // Calcular valor total usando Strategy Pattern
+      const valorTotal = await this.calcularValorTotal(prendasCompletas);
 
       // Crear servicio
       const nuevoServicio = this.servicioRepository.create({
@@ -125,6 +139,7 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
   reset(): IServicioAlquilerBuilder {
     this.servicio = {};
     this.prendasSeleccionadas = [];
+    this.estrategiaPrecio = null;
     return this;
   }
 
@@ -231,11 +246,39 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
     }
   }
 
-  private calcularValorTotal(prendas: Prenda[]): number {
-    return prendas.reduce(
-      (total, prenda) => total + Number(prenda.valorAlquiler),
-      0,
-    );
+  /**
+   * Calcula el valor total usando Strategy Pattern
+   * Si hay una estrategia específica, la usa; si no, selecciona la mejor automáticamente
+   * @param prendas - Prendas del servicio
+   * @returns Valor total calculado
+   */
+  private async calcularValorTotal(prendas: Prenda[]): Promise<number> {
+    // Cargar cliente completo si es necesario
+    const cliente = await this.cargarCliente();
+
+    // Crear contexto para el cálculo de precio
+    const context = {
+      prendas,
+      cliente,
+      fechaAlquiler: this.servicio.fechaAlquiler || new Date(),
+    };
+
+    // Usar estrategia específica o seleccionar la mejor automáticamente
+    const resultado = this.estrategiaPrecio
+      ? this.estrategiaPrecio.calcularPrecio(context)
+      : this.pricingContext.calcularMejorPrecio(context);
+
+    // Log para debugging
+    console.log(`💰 Cálculo de precio:`, {
+      estrategia: this.estrategiaPrecio?.getNombre() ||
+        this.pricingContext.getEstrategiaActual().getNombre(),
+      precioBase: resultado.precioBase,
+      descuento: resultado.descuento,
+      precioFinal: resultado.precioFinal,
+      detalles: resultado.detalles,
+    });
+
+    return resultado.precioFinal;
   }
 
   private async actualizarEstadoPrendas(

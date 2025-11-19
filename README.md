@@ -7,7 +7,7 @@ API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (v
 - **Patrones de Diseño Implementados:**
   - **Creacionales**: Factory Method, Builder, Singleton
   - **Estructurales**: Decorator, Repository, Adapter, Composite, Facade
-  - **Comportamiento**: State (gestión de ciclo de vida de servicios)
+  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios)
 
 - **Módulos:**
   - Gestión de Prendas (vestidos, trajes, disfraces)
@@ -146,7 +146,7 @@ los-atuendos/
 │   ├── patterns/            # Implementación de patrones de diseño
 │   │   ├── creational/      # Factory, Builder, Singleton
 │   │   ├── structural/      # Decorator, Repository, Adapter, Composite, Facade
-│   │   └── behavioral/      # State (gestión de estados)
+│   │   └── behavioral/      # State, Strategy
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
@@ -190,6 +190,17 @@ Abstrae la lógica de acceso a datos.
 Ubicación: `src/patterns/behavioral/state/`
 
 Gestiona el ciclo de vida de los servicios de alquiler mediante estados bien definidos (Pendiente, Confirmado, Entregado, Devuelto, Cancelado), validando automáticamente las transiciones permitidas.
+
+### Strategy Pattern
+
+Ubicación: `src/patterns/behavioral/strategy/`
+
+Calcula el precio de alquiler mediante estrategias intercambiables que se seleccionan automáticamente según el contexto:
+- **Regular**: Precio base sin descuentos
+- **VIP**: 15% descuento para clientes VIP
+- **Seasonal**: Descuentos por temporada (Alta 0%, Media 5%, Baja 10%)
+- **Bulk**: Descuentos por cantidad (3-5 prendas 5%, 6-10 prendas 10%, 11+ prendas 15%)
+- **Promotional**: Promociones especiales (San Valentín 20%, Día de la Madre 15%, Black Friday 25%, Navidad 20%)
 
 ## Solución de Problemas
 
