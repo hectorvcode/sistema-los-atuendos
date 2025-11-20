@@ -2,6 +2,8 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Optional,
+  Inject,
 } from '@nestjs/common';
 import { ServicioAlquilerBuilder } from '../../../patterns/creational/builder/servicio-alquiler.builder';
 import { ServicioRepository } from '../repositories/servicio.repository';
@@ -16,6 +18,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Prenda } from '../../prendas/entities/prenda.entity';
 import { ServicioStateContext } from '../../../patterns/behavioral/state';
+import {
+  ServicioSubject,
+  ServicioEventType,
+} from '../../../patterns/behavioral/observer';
 
 /**
  * ServiciosService - Lógica de negocio para servicios de alquiler
@@ -23,6 +29,7 @@ import { ServicioStateContext } from '../../../patterns/behavioral/state';
  * - Builder Pattern para construcción compleja de servicios
  * - Singleton Pattern para generación de consecutivos
  * - State Pattern para gestión del ciclo de vida del servicio
+ * - Observer Pattern para notificaciones de eventos
  */
 @Injectable()
 export class ServiciosService {
@@ -32,6 +39,7 @@ export class ServiciosService {
     private readonly stateContext: ServicioStateContext,
     @InjectRepository(Prenda)
     private readonly prendaRepository: Repository<Prenda>,
+    @Optional() @Inject(ServicioSubject) private readonly subject?: ServicioSubject,
   ) {}
 
   /**
@@ -70,6 +78,11 @@ export class ServiciosService {
         .agregarPrendas(createServicioDto.prendasIds)
         .setObservaciones(createServicioDto.observaciones || '')
         .build();
+
+      // Notificar a los observadores (Observer Pattern)
+      if (this.subject) {
+        await this.subject.notify(ServicioEventType.SERVICIO_CREADO, servicio);
+      }
 
       return servicio;
     } catch (error) {

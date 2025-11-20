@@ -54,6 +54,27 @@ describe('ServiciosService', () => {
           provide: getRepositoryToken(Prenda),
           useValue: mockPrendaRepository,
         },
+        {
+          provide: 'ServicioStateContext',
+          useValue: {
+            confirmar: jest.fn(),
+            entregar: jest.fn(),
+            devolver: jest.fn(),
+            cancelar: jest.fn(),
+            obtenerInformacionEstado: jest.fn().mockReturnValue({
+              estadoActual: 'pendiente',
+              puedeModificar: true,
+              puedeEliminar: true,
+              transicionesPermitidas: ['confirmado', 'cancelado'],
+            }),
+          },
+        },
+        {
+          provide: 'ServicioSubject',
+          useValue: {
+            notify: jest.fn(),
+          },
+        },
       ],
     }).compile();
 

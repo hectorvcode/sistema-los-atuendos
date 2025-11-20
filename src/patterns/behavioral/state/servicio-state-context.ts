@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, Optional } from '@nestjs/common';
 import { IServicioState } from './servicio-state.interface';
 import { ServicioAlquiler } from '../../../modules/servicios/entities/servicio-alquiler.entity';
 import { PendingState } from './states/pending-state';
@@ -6,6 +6,8 @@ import { ConfirmedState } from './states/confirmed-state';
 import { DeliveredState } from './states/delivered-state';
 import { ReturnedState } from './states/returned-state';
 import { CancelledState } from './states/cancelled-state';
+import { ServicioSubject } from '../observer/servicio-subject';
+import { ServicioEventType } from '../observer/servicio-event.interface';
 
 /**
  * StateContext - Gestor de estados del patrón State
@@ -15,8 +17,9 @@ import { CancelledState } from './states/cancelled-state';
  * - Delegar operaciones al estado correspondiente
  * - Gestionar transiciones entre estados
  * - Proporcionar interfaz simplificada para operaciones de estado
+ * - Notificar eventos a observadores (integración con Observer Pattern)
  *
- * Patrón de Diseño: State Pattern
+ * Patrón de Diseño: State Pattern + Observer Pattern
  */
 @Injectable()
 export class ServicioStateContext {
@@ -28,6 +31,7 @@ export class ServicioStateContext {
     private readonly deliveredState: DeliveredState,
     private readonly returnedState: ReturnedState,
     private readonly cancelledState: CancelledState,
+    @Optional() @Inject(ServicioSubject) private readonly subject?: ServicioSubject,
   ) {
     // Inicializar mapa de estados
     this.estados = new Map<string, IServicioState>([
@@ -64,6 +68,11 @@ export class ServicioStateContext {
     if (nuevoEstado.onEnter) {
       await nuevoEstado.onEnter(servicio);
     }
+
+    // Notificar evento a observadores
+    if (this.subject) {
+      await this.subject.notify(ServicioEventType.SERVICIO_CONFIRMADO, servicio);
+    }
   }
 
   /**
@@ -77,6 +86,11 @@ export class ServicioStateContext {
     const nuevoEstado = this.getEstadoActual(servicio);
     if (nuevoEstado.onEnter) {
       await nuevoEstado.onEnter(servicio);
+    }
+
+    // Notificar evento a observadores
+    if (this.subject) {
+      await this.subject.notify(ServicioEventType.SERVICIO_ENTREGADO, servicio);
     }
   }
 
@@ -92,6 +106,33 @@ export class ServicioStateContext {
     if (nuevoEstado.onEnter) {
       await nuevoEstado.onEnter(servicio);
     }
+
+    // Calcular días de retraso basándose en las fechas
+    const metadata: Record<string, any> = {};
+    if (servicio.fechaDevolucion && servicio.fechaAlquiler) {
+      const fechaEsperada = new Date(servicio.fechaAlquiler);
+      const fechaReal = new Date(servicio.fechaDevolucion);
+      const diferenciaDias = Math.ceil(
+        (fechaReal.getTime() - fechaEsperada.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
+      if (diferenciaDias > 0) {
+        metadata.diasRetraso = diferenciaDias;
+        // Notificar devolución tardía
+        if (this.subject) {
+          await this.subject.notify(
+            ServicioEventType.DEVOLUCION_TARDIA,
+            servicio,
+            metadata,
+          );
+        }
+      }
+    }
+
+    // Notificar evento a observadores
+    if (this.subject) {
+      await this.subject.notify(ServicioEventType.SERVICIO_DEVUELTO, servicio, metadata);
+    }
   }
 
   /**
@@ -105,6 +146,11 @@ export class ServicioStateContext {
     const nuevoEstado = this.getEstadoActual(servicio);
     if (nuevoEstado.onEnter) {
       await nuevoEstado.onEnter(servicio);
+    }
+
+    // Notificar evento a observadores
+    if (this.subject) {
+      await this.subject.notify(ServicioEventType.SERVICIO_CANCELADO, servicio);
     }
   }
 

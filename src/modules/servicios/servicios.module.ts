@@ -26,6 +26,15 @@ import {
   BulkPricingStrategy,
   PromotionalPricingStrategy,
 } from '../../patterns/behavioral/strategy';
+// Observer Pattern imports
+import {
+  ServicioSubject,
+  EmailNotificationObserver,
+  SmsNotificationObserver,
+  AuditLogObserver,
+  DashboardObserver,
+  ReportGeneratorObserver,
+} from '../../patterns/behavioral/observer';
 
 /**
  * ServiciosModule - Módulo de gestión de servicios de alquiler
@@ -35,6 +44,7 @@ import {
  * - Repository Pattern para abstracción de persistencia
  * - State Pattern para gestión del ciclo de vida del servicio
  * - Strategy Pattern para cálculo flexible de precios
+ * - Observer Pattern para notificaciones de eventos
  */
 @Module({
   imports: [
@@ -60,6 +70,13 @@ import {
     SeasonalPricingStrategy,
     BulkPricingStrategy,
     PromotionalPricingStrategy,
+    // Observer Pattern providers
+    ServicioSubject,
+    EmailNotificationObserver,
+    SmsNotificationObserver,
+    AuditLogObserver,
+    DashboardObserver,
+    ReportGeneratorObserver,
   ],
   exports: [
     ServiciosService,

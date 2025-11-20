@@ -7,7 +7,7 @@ API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (v
 - **Patrones de Diseño Implementados:**
   - **Creacionales**: Factory Method, Builder, Singleton
   - **Estructurales**: Decorator, Repository, Adapter, Composite, Facade
-  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios)
+  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios), Observer (notificaciones de eventos)
 
 - **Módulos:**
   - Gestión de Prendas (vestidos, trajes, disfraces)
@@ -146,7 +146,7 @@ los-atuendos/
 │   ├── patterns/            # Implementación de patrones de diseño
 │   │   ├── creational/      # Factory, Builder, Singleton
 │   │   ├── structural/      # Decorator, Repository, Adapter, Composite, Facade
-│   │   └── behavioral/      # State, Strategy
+│   │   └── behavioral/      # State, Strategy, Observer
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
@@ -201,6 +201,25 @@ Calcula el precio de alquiler mediante estrategias intercambiables que se selecc
 - **Seasonal**: Descuentos por temporada (Alta 0%, Media 5%, Baja 10%)
 - **Bulk**: Descuentos por cantidad (3-5 prendas 5%, 6-10 prendas 10%, 11+ prendas 15%)
 - **Promotional**: Promociones especiales (San Valentín 20%, Día de la Madre 15%, Black Friday 25%, Navidad 20%)
+
+### Observer Pattern
+
+Ubicación: `src/patterns/behavioral/observer/`
+
+Sistema de notificaciones desacoplado que permite a múltiples observadores reaccionar automáticamente a eventos del sistema:
+
+**Eventos Soportados:**
+- SERVICIO_CREADO, SERVICIO_CONFIRMADO, SERVICIO_ENTREGADO
+- SERVICIO_DEVUELTO, SERVICIO_CANCELADO, DEVOLUCION_TARDIA, SERVICIO_MODIFICADO
+
+**Observadores Implementados:**
+- **EmailNotificationObserver**: Envía correos electrónicos para eventos importantes
+- **SmsNotificationObserver**: Envía SMS solo para eventos críticos (confirmación, entrega, devolución tardía)
+- **AuditLogObserver**: Registra todos los eventos en logs de auditoría
+- **DashboardObserver**: Actualiza estadísticas en tiempo real
+- **ReportGeneratorObserver**: Genera reportes automáticos al completar o cancelar servicios
+
+**Integración:** Se integra automáticamente con el State Pattern, notificando eventos en cada transición de estado.
 
 ## Solución de Problemas
 

@@ -794,6 +794,191 @@ const resultado2 = pricingContext.calcularMejorPrecio({
 
 ---
 
+## Observer Pattern
+
+**Ubicación**: `src/patterns/behavioral/observer/`
+
+**Propósito**: Implementar un sistema de notificaciones desacoplado donde múltiples observadores pueden reaccionar automáticamente a eventos del sistema sin que el emisor conozca a los receptores.
+
+### Componentes
+
+#### 1. Event Types (ServicioEventType)
+
+Define todos los eventos posibles en el ciclo de vida de un servicio:
+
+```typescript
+enum ServicioEventType {
+  SERVICIO_CREADO = 'servicio.creado',
+  SERVICIO_CONFIRMADO = 'servicio.confirmado',
+  SERVICIO_ENTREGADO = 'servicio.entregado',
+  SERVICIO_DEVUELTO = 'servicio.devuelto',
+  SERVICIO_CANCELADO = 'servicio.cancelado',
+  DEVOLUCION_TARDIA = 'servicio.devolucion_tardia',
+  SERVICIO_MODIFICADO = 'servicio.modificado',
+}
+```
+
+#### 2. Subject (ServicioSubject)
+
+Gestiona el registro de observadores y la notificación de eventos:
+
+```typescript
+@Injectable()
+export class ServicioSubject {
+  private observers: IServicioObserver[] = [];
+
+  attach(observer: IServicioObserver): void;
+  detach(observer: IServicioObserver): void;
+  async notify(tipo: ServicioEventType, servicio: ServicioAlquiler, metadata?: Record<string, any>): Promise<void>;
+}
+```
+
+**Funcionalidad**:
+- Mantiene lista de observadores registrados
+- Notifica solo a observadores suscritos al evento específico
+- Ejecuta notificaciones en paralelo usando Promise.all
+- Maneja errores sin interrumpir a otros observadores
+
+#### 3. Observadores Implementados
+
+**EmailNotificationObserver**
+- **Eventos**: Todos los eventos principales (CREADO, CONFIRMADO, ENTREGADO, DEVUELTO, CANCELADO, MODIFICADO)
+- **Función**: Envía correos electrónicos informativos al cliente
+- **Estado**: Simulado (listo para integrar servicio de email real)
+
+**SmsNotificationObserver**
+- **Eventos**: Solo críticos (CONFIRMADO, ENTREGADO, DEVOLUCION_TARDIA)
+- **Función**: Envía mensajes SMS urgentes
+- **Estado**: Simulado (listo para integrar API de SMS)
+
+**AuditLogObserver**
+- **Eventos**: Todos (suscripción global)
+- **Función**: Registra todos los eventos para auditoría
+- **Almacenamiento**: In-memory (listo para persistencia en BD)
+
+**DashboardObserver**
+- **Eventos**: Todos (suscripción global)
+- **Función**: Actualiza estadísticas en tiempo real
+- **Métricas**: Total servicios, por estado, confirmados, entregados, devueltos
+
+**ReportGeneratorObserver**
+- **Eventos**: Finalización (DEVUELTO, CANCELADO, DEVOLUCION_TARDIA)
+- **Función**: Genera reportes automáticos al completar servicios
+- **Tipos**: Reporte de devolución, reporte de cancelación, reporte de demora
+
+### Integración con State Pattern
+
+El Observer Pattern se integra automáticamente con el State Pattern en `ServicioStateContext`:
+
+```typescript
+@Injectable()
+export class ServicioStateContext {
+  constructor(
+    // ... states
+    @Optional() @Inject(ServicioSubject) private readonly subject?: ServicioSubject,
+  ) {}
+
+  async confirmar(servicio: ServicioAlquiler): Promise<void> {
+    await estadoActual.confirmar(servicio);
+
+    if (this.subject) {
+      await this.subject.notify(ServicioEventType.SERVICIO_CONFIRMADO, servicio);
+    }
+  }
+}
+```
+
+**Flujo de Eventos**:
+1. Usuario llama a una transición de estado (ej: confirmar)
+2. State Pattern valida y ejecuta la transición
+3. ServicioStateContext notifica al Subject
+4. Subject filtra observadores suscritos al evento
+5. Observadores ejecutan sus acciones en paralelo
+
+### Diagrama de Flujo
+
+```
+Usuario → ServiciosService
+    ↓
+ServicioStateContext.confirmar()
+    ↓
+PendingState.confirmar() → Cambia estado
+    ↓
+ServicioSubject.notify(SERVICIO_CONFIRMADO)
+    ↓
+    ├→ EmailNotificationObserver → Envía email
+    ├→ SmsNotificationObserver → Envía SMS
+    ├→ AuditLogObserver → Registra log
+    ├→ DashboardObserver → Actualiza stats
+    └→ ReportGeneratorObserver → (No actúa, no suscrito)
+```
+
+### Ventajas de la Implementación
+
+1. **Desacoplamiento Total**: El Subject no conoce a los observadores concretos
+2. **Extensibilidad**: Nuevos observadores se agregan sin modificar código existente
+3. **Suscripción Selectiva**: Cada observador elige qué eventos procesar
+4. **Ejecución Paralela**: Notificaciones se ejecutan concurrentemente
+5. **Tolerancia a Fallos**: Error en un observador no afecta a los demás
+6. **Inyección Opcional**: No rompe tests existentes gracias a @Optional()
+
+### Ejemplo de Uso
+
+```typescript
+// El sistema automáticamente notifica en cada transición de estado
+await serviciosService.confirmarServicio(servicioId);
+// → Notifica SERVICIO_CONFIRMADO
+// → EmailObserver envía correo
+// → SmsObserver envía SMS
+// → AuditObserver registra evento
+// → DashboardObserver actualiza estadísticas
+
+await serviciosService.entregarServicio(servicioId);
+// → Notifica SERVICIO_ENTREGADO
+// → Todos los observadores pertinentes reaccionan
+```
+
+### Extensión: Agregar Nuevo Observador
+
+```typescript
+@Injectable()
+export class WhatsAppNotificationObserver implements IServicioObserver {
+  getNombre(): string {
+    return 'WhatsAppNotificationObserver';
+  }
+
+  getEventosSuscritos(): ServicioEventType[] {
+    return [
+      ServicioEventType.SERVICIO_CONFIRMADO,
+      ServicioEventType.SERVICIO_ENTREGADO,
+    ];
+  }
+
+  async update(event: ServicioEvent): Promise<void> {
+    // Enviar mensaje de WhatsApp
+    console.log(`Enviando WhatsApp al ${event.servicio.cliente.telefono}`);
+  }
+}
+
+// Registrar en ServiciosModule
+providers: [
+  // ... otros providers
+  WhatsAppNotificationObserver,
+],
+
+// Inyectar en ServicioSubject
+constructor(
+  // ... otros observadores
+  @Optional() private readonly whatsAppObserver?: WhatsAppNotificationObserver,
+) {
+  if (this.whatsAppObserver) this.attach(this.whatsAppObserver);
+}
+```
+
+**Tests**: 31 tests unitarios cubriendo todos los observadores, notificaciones, suscripciones y manejo de errores.
+
+---
+
 ## Módulos del Sistema
 
 ### 1. Módulo de Prendas
