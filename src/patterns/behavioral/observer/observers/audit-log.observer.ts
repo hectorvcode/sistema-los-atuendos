@@ -41,7 +41,7 @@ export class AuditLogObserver implements IServicioObserver {
       id: this.generarId(),
       timestamp,
       eventType: tipo,
-      servicioNumero: servicio.numero,
+      servicioNumero: servicio.numero.toString(),
       servicioId: servicio.id,
       estadoNuevo: servicio.estado,
       metadata,

@@ -102,6 +102,51 @@ npm run test:unit:cov
 
 ### Tests por Patrón de Diseño
 
+#### Command Pattern
+
+```bash
+npm run test -- command
+```
+
+**Valida**:
+
+- Ejecución correcta de comandos (confirmar, entregar, devolver, cancelar)
+- Funcionalidad de undo (deshacer operaciones)
+- Funcionalidad de redo (rehacer operaciones deshechas)
+- Gestión del historial de comandos (CommandHistory)
+- Límite de historial (máximo 50 comandos)
+- Metadata de ejecución (timestamp, parámetros, resultados)
+- CommandInvoker ejecuta y registra comandos correctamente
+- CommandFactory crea comandos con dependencias inyectadas
+
+**Ejemplo de Test**:
+
+```typescript
+it('should execute confirm command and register in history', async () => {
+  const command = commandFactory.createConfirmarServicioCommand(servicioId);
+
+  const result = await commandInvoker.execute(command);
+
+  expect(result.estado).toBe('confirmado');
+  expect(commandInvoker.canUndo()).toBe(true);
+
+  const history = commandInvoker.getHistory();
+  expect(history).toHaveLength(1);
+  expect(history[0].commandName).toBe('ConfirmarServicioCommand');
+});
+
+it('should undo confirm command', async () => {
+  const command = commandFactory.createConfirmarServicioCommand(servicioId);
+  await commandInvoker.execute(command);
+
+  await commandInvoker.undo();
+
+  const servicio = await servicioRepository.findOne({ where: { id: servicioId } });
+  expect(servicio.estado).toBe('pendiente');
+  expect(commandInvoker.canRedo()).toBe(true);
+});
+```
+
 #### Factory Method Pattern
 
 ```bash

@@ -3,7 +3,7 @@ import {
   PricingContext,
   PricingResult,
 } from './pricing-strategy.interface';
-import { Prenda } from '../../modules/prendas/entities/prenda.entity';
+import { Prenda } from '../../../modules/prendas/entities/prenda.entity';
 
 /**
  * Clase abstracta base para estrategias de pricing

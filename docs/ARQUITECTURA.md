@@ -979,6 +979,354 @@ constructor(
 
 ---
 
+## Command Pattern
+
+**Ubicación**: `src/patterns/behavioral/command/`
+
+**Propósito**: Encapsular operaciones de cambio de estado como objetos independientes, permitiendo deshacer (undo) y rehacer (redo) operaciones, mantener historial completo de comandos ejecutados y proporcionar trazabilidad para auditoría.
+
+### Componentes
+
+#### 1. Interfaz ICommand
+
+Define el contrato que todos los comandos deben implementar:
+
+```typescript
+interface ICommand {
+  execute(): Promise<any>;           // Ejecuta la acción del comando
+  undo(): Promise<void>;             // Deshace la acción
+  getName(): string;                 // Nombre para auditoría
+  getParams(): Record<string, any>;  // Parámetros para logging
+}
+```
+
+#### 2. Comandos Concretos
+
+Cada comando encapsula una operación específica de cambio de estado del servicio:
+
+**ConfirmarServicioCommand**
+- **Acción**: Transiciona servicio de `pendiente` → `confirmado`
+- **Undo**: Revierte al estado `pendiente`
+- **Metadata**: Captura estado anterior y nuevo para auditoría
+
+**EntregarServicioCommand**
+- **Acción**: Transiciona servicio de `confirmado` → `entregado`
+- **Undo**: Revierte al estado `confirmado`
+
+**DevolverServicioCommand**
+- **Acción**: Transiciona servicio de `entregado` → `devuelto`
+- **Extra**: Registra fecha de devolución
+- **Undo**: Revierte al estado `entregado` y restaura fecha de devolución anterior
+
+**CancelarServicioCommand**
+- **Acción**: Cancela servicio y libera prendas
+- **Extra**: Marca todas las prendas como disponibles
+- **Undo**: Revierte estado y restaura disponibilidad anterior de prendas
+
+#### 3. CommandHistory
+
+Gestor de historial que mantiene registro de comandos ejecutados:
+
+```typescript
+@Injectable()
+export class CommandHistory {
+  private history: ICommand[] = [];         // Historial de comandos ejecutados
+  private redoStack: ICommand[] = [];       // Stack para comandos deshechos
+  private executionMetadata: Map<...>;      // Metadata de ejecución
+  private readonly maxHistorySize = 50;     // Límite de historial
+
+  push(command, result): void;    // Registra comando ejecutado
+  undo(): Promise<void>;          // Deshace último comando
+  redo(): Promise<void>;          // Rehace último deshecho
+  getHistory(): Metadata[];       // Obtiene historial completo
+  canUndo(): boolean;             // Verifica si puede deshacer
+  canRedo(): boolean;             // Verifica si puede rehacer
+}
+```
+
+**Funcionalidad**:
+- Mantiene hasta 50 comandos en historial (FIFO cuando se excede)
+- Stack de redo se limpia cuando se ejecuta nuevo comando
+- Metadata incluye: nombre, parámetros, timestamp, resultado y errores
+- Manejo de errores sin perder integridad del historial
+
+#### 4. CommandInvoker
+
+Invocador centralizado que ejecuta comandos y gestiona el historial:
+
+```typescript
+@Injectable()
+export class CommandInvoker {
+  constructor(private readonly history: CommandHistory) {}
+
+  async execute(command): Promise<any>;     // Ejecuta y registra comando
+  async executeAll(commands): Promise<any[]>; // Ejecuta múltiples comandos
+  async undo(): Promise<void>;              // Deshace último comando
+  async redo(): Promise<void>;              // Rehace último deshecho
+  getHistory(): Metadata[];                 // Obtiene historial
+  clearHistory(): void;                     // Limpia historial
+  canUndo(): boolean;                       // Verifica undo disponible
+  canRedo(): boolean;                       // Verifica redo disponible
+}
+```
+
+**Responsabilidades**:
+- Ejecutar comandos de forma centralizada
+- Registrar automáticamente en historial
+- Proporcionar interfaz para undo/redo
+- Logging de operaciones (usa Logger de NestJS)
+- Manejo de errores con propagación controlada
+
+#### 5. CommandFactory
+
+Factory para crear instancias de comandos con dependencias inyectadas:
+
+```typescript
+@Injectable()
+export class CommandFactory {
+  constructor(
+    @InjectRepository(ServicioAlquiler) private readonly servicioRepo,
+    @InjectRepository(Prenda) private readonly prendaRepo,
+    private readonly stateContext: ServicioStateContext,
+  ) {}
+
+  createConfirmarServicioCommand(id): ConfirmarServicioCommand;
+  createEntregarServicioCommand(id): EntregarServicioCommand;
+  createDevolverServicioCommand(id): DevolverServicioCommand;
+  createCancelarServicioCommand(id): CancelarServicioCommand;
+}
+```
+
+### Integración con ServiciosService
+
+El servicio ahora utiliza Command Pattern para todas las operaciones de estado:
+
+```typescript
+@Injectable()
+export class ServiciosService {
+  constructor(
+    // ... otros servicios
+    private readonly commandInvoker: CommandInvoker,
+    private readonly commandFactory: CommandFactory,
+  ) {}
+
+  async confirmarServicio(id: number): Promise<ServicioAlquiler> {
+    const command = this.commandFactory.createConfirmarServicioCommand(id);
+    return await this.commandInvoker.execute(command);
+  }
+
+  async deshacerUltimaOperacion(): Promise<void> {
+    return await this.commandInvoker.undo();
+  }
+
+  async rehacerOperacion(): Promise<void> {
+    return await this.commandInvoker.redo();
+  }
+
+  obtenerHistorialComandos() {
+    return this.commandInvoker.getHistory();
+  }
+
+  puedeDeshacerOperacion(): boolean {
+    return this.commandInvoker.canUndo();
+  }
+
+  puedeRehacerOperacion(): boolean {
+    return this.commandInvoker.canRedo();
+  }
+}
+```
+
+### Integración con otros Patrones
+
+**State Pattern**
+- Los comandos utilizan `ServicioStateContext` para validar y ejecutar transiciones de estado
+- State Pattern mantiene la lógica de validación de transiciones
+- Comandos delegan la transición al State Context
+
+**Observer Pattern**
+- Las transiciones de estado ejecutadas por comandos disparan eventos del Observer Pattern automáticamente
+- Observer Pattern notifica a todos los observadores suscritos
+
+**Repository Pattern**
+- Los comandos acceden a datos a través de repositorios inyectados
+- Mantiene abstracción de persistencia
+
+**Factory Pattern**
+- `CommandFactory` facilita la creación de comandos con inyección de dependencias
+- Simplifica el uso desde ServiciosService
+
+### Diagrama de Flujo
+
+```
+Usuario → ServiciosService.confirmarServicio(id)
+    ↓
+CommandFactory.createConfirmarServicioCommand(id)
+    ↓
+CommandInvoker.execute(command)
+    ↓
+    ├─► CommandHistory.push(command)  [Registro]
+    └─► Command.execute()
+            ↓
+        ServicioStateContext.confirmar()  [State Pattern]
+            ↓
+        ServicioSubject.notify()  [Observer Pattern]
+            ↓
+        Return ServicioAlquiler actualizado
+```
+
+### Diagrama de Clases (Simplificado)
+
+```
+┌──────────────────────┐
+│    <<interface>>     │
+│      ICommand        │
+├──────────────────────┤
+│ + execute()          │
+│ + undo()             │
+│ + getName()          │
+│ + getParams()        │
+└──────────▲───────────┘
+           │ implements
+           │
+    ┌──────┴──────┬────────────┬────────────┐
+    │             │            │            │
+┌───▼────┐  ┌────▼────┐  ┌────▼────┐  ┌───▼────┐
+│Confirmar│  │Entregar│  │Devolver │  │Cancelar│
+│Command │  │Command │  │Command  │  │Command │
+└─────────┘  └─────────┘  └─────────┘  └────────┘
+
+┌──────────────────────┐
+│  CommandInvoker      │
+├──────────────────────┤
+│ - history            │
+│ + execute(cmd)       │
+│ + undo()             │
+│ + redo()             │
+└──────────────────────┘
+         │ uses
+         ▼
+┌──────────────────────┐
+│  CommandHistory      │
+├──────────────────────┤
+│ - history[]          │
+│ - redoStack[]        │
+│ - metadata           │
+│ + push()             │
+│ + undo()             │
+│ + redo()             │
+└──────────────────────┘
+```
+
+### Ventajas de la Implementación
+
+1. **Desacoplamiento Total**: Los emisores de comandos no conocen los receptores
+2. **Capacidad de Undo/Redo**: Todas las transiciones pueden deshacerse
+3. **Auditoría Completa**: Historial con metadata (timestamp, parámetros, resultados)
+4. **Encapsulamiento**: Lógica de operaciones encapsulada en comandos
+5. **Extensibilidad**: Fácil agregar nuevos comandos sin modificar código existente
+6. **Composición**: Comandos pueden combinarse (executeAll)
+7. **Testabilidad**: Cada comando es testeable independientemente
+8. **Cumple SOLID**: Single Responsibility, Open/Closed, Dependency Inversion
+
+### Ejemplo de Uso
+
+```typescript
+// Escenario: Usuario confirma un servicio por error
+
+// 1. Confirmar servicio
+const servicio = await serviciosService.confirmarServicio(1);
+// Estado: pendiente → confirmado
+// CommandHistory registra: ConfirmarServicioCommand
+
+// 2. El usuario se da cuenta del error, deshacer
+await serviciosService.deshacerUltimaOperacion();
+// Estado: confirmado → pendiente
+// ConfirmarServicioCommand.undo() ejecutado
+
+// 3. Verificar si puede rehacer
+const puedeRehacer = serviciosService.puedeRehacerOperacion(); // true
+
+// 4. Rehacer la confirmación
+await serviciosService.rehacerOperacion();
+// Estado: pendiente → confirmado
+// ConfirmarServicioCommand.execute() ejecutado nuevamente
+
+// 5. Ver historial completo
+const historial = serviciosService.obtenerHistorialComandos();
+/*
+[
+  {
+    commandName: "ConfirmarServicioCommand",
+    params: { servicioId: 1, estadoAnterior: "pendiente", estadoNuevo: "confirmado" },
+    executedAt: "2025-11-21T10:30:00Z",
+    result: { id: 1, estado: "confirmado", ... }
+  }
+]
+*/
+```
+
+### Casos de Uso
+
+1. **Corrección de Errores Humanos**: Revertir confirmaciones o entregas erróneas
+2. **Auditoría Completa**: Rastrear quién hizo qué y cuándo
+3. **Testing**: Probar comandos de forma aislada
+4. **Operaciones Batch**: Ejecutar múltiples comandos en secuencia
+5. **Rollback**: Revertir operaciones en caso de error
+
+### Extensión: Agregar Nuevo Comando
+
+```typescript
+// 1. Crear comando que implementa ICommand
+@Injectable()
+export class ModificarObservacionesCommand implements ICommand {
+  constructor(
+    private readonly servicioRepository: Repository<ServicioAlquiler>,
+    private readonly servicioId: number,
+    private readonly nuevasObservaciones: string,
+  ) {}
+
+  private observacionesAnteriores: string;
+
+  async execute() {
+    const servicio = await this.servicioRepository.findOne({ where: { id: this.servicioId } });
+    this.observacionesAnteriores = servicio.observaciones;
+    servicio.observaciones = this.nuevasObservaciones;
+    return await this.servicioRepository.save(servicio);
+  }
+
+  async undo() {
+    const servicio = await this.servicioRepository.findOne({ where: { id: this.servicioId } });
+    servicio.observaciones = this.observacionesAnteriores;
+    await this.servicioRepository.save(servicio);
+  }
+
+  getName() { return 'ModificarObservacionesCommand'; }
+  getParams() { return { servicioId: this.servicioId, observaciones: this.nuevasObservaciones }; }
+}
+
+// 2. Agregar método en CommandFactory
+createModificarObservacionesCommand(id, obs) {
+  return new ModificarObservacionesCommand(this.servicioRepository, id, obs);
+}
+
+// 3. Usar en ServiciosService
+async modificarObservaciones(id, observaciones) {
+  const command = this.commandFactory.createModificarObservacionesCommand(id, observaciones);
+  return await this.commandInvoker.execute(command);
+}
+```
+
+### Consideraciones
+
+- **Límite de Historial**: 50 comandos para evitar consumo excesivo de memoria
+- **Persistencia**: Historial en memoria, se pierde al reiniciar (puede extenderse a BD)
+- **Concurrencia**: No diseñado para operaciones concurrentes sobre el mismo recurso
+- **Undo Complejo**: Algunos comandos pueden tener limitaciones de undo (efectos externos)
+- **Transacciones**: Los comandos no son transaccionales a nivel de BD (puede agregarse)
+
+---
+
 ## Módulos del Sistema
 
 ### 1. Módulo de Prendas

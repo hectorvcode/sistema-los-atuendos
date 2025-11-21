@@ -22,6 +22,10 @@ import {
   ServicioSubject,
   ServicioEventType,
 } from '../../../patterns/behavioral/observer';
+import {
+  CommandInvoker,
+  CommandFactory,
+} from '../../../patterns/behavioral/command';
 
 /**
  * ServiciosService - Lógica de negocio para servicios de alquiler
@@ -30,6 +34,7 @@ import {
  * - Singleton Pattern para generación de consecutivos
  * - State Pattern para gestión del ciclo de vida del servicio
  * - Observer Pattern para notificaciones de eventos
+ * - Command Pattern para encapsular operaciones de estado con capacidad de undo/redo
  */
 @Injectable()
 export class ServiciosService {
@@ -39,6 +44,8 @@ export class ServiciosService {
     private readonly stateContext: ServicioStateContext,
     @InjectRepository(Prenda)
     private readonly prendaRepository: Repository<Prenda>,
+    private readonly commandInvoker: CommandInvoker,
+    private readonly commandFactory: CommandFactory,
     @Optional() @Inject(ServicioSubject) private readonly subject?: ServicioSubject,
   ) {}
 
@@ -297,73 +304,88 @@ export class ServiciosService {
 
   /**
    * Confirma un servicio (pendiente → confirmado)
-   * Usa State Pattern para validar la transición
+   * Usa Command Pattern para encapsular la operación con capacidad de undo
    */
   async confirmarServicio(id: number): Promise<ServicioAlquiler> {
-    const servicio = await this.buscarPorId(id);
+    // Crear comando usando Factory
+    const command = this.commandFactory.createConfirmarServicioCommand(id);
 
-    // Usar State Pattern para la transición
-    await this.stateContext.confirmar(servicio);
-
-    // Persistir el cambio
-    return await this.servicioRepository.actualizar(id, {
-      estado: servicio.estado,
-    });
+    // Ejecutar comando a través del Invoker
+    // Esto registrará el comando en el historial para permitir undo/redo
+    return await this.commandInvoker.execute(command);
   }
 
   /**
    * Entrega un servicio al cliente (confirmado → entregado)
-   * Usa State Pattern para validar la transición
+   * Usa Command Pattern para encapsular la operación con capacidad de undo
    */
   async entregarServicio(id: number): Promise<ServicioAlquiler> {
-    const servicio = await this.buscarPorId(id);
+    // Crear comando usando Factory
+    const command = this.commandFactory.createEntregarServicioCommand(id);
 
-    // Usar State Pattern para la transición
-    await this.stateContext.entregar(servicio);
-
-    // Persistir el cambio
-    return await this.servicioRepository.actualizar(id, {
-      estado: servicio.estado,
-    });
+    // Ejecutar comando a través del Invoker
+    return await this.commandInvoker.execute(command);
   }
 
   /**
    * Registra la devolución de un servicio (entregado → devuelto)
-   * Usa State Pattern para validar la transición
+   * Usa Command Pattern para encapsular la operación con capacidad de undo
    */
   async devolverServicio(id: number): Promise<ServicioAlquiler> {
-    const servicio = await this.buscarPorId(id);
+    // Crear comando usando Factory
+    const command = this.commandFactory.createDevolverServicioCommand(id);
 
-    // Usar State Pattern para la transición
-    await this.stateContext.devolver(servicio);
-
-    // Liberar prendas (ahora van a lavandería)
-    await this.liberarPrendas(servicio.prendas.map((p) => p.id));
-
-    // Persistir el cambio con la fecha de devolución
-    return await this.servicioRepository.actualizar(id, {
-      estado: servicio.estado,
-      fechaDevolucion: servicio.fechaDevolucion,
-    });
+    // Ejecutar comando a través del Invoker
+    return await this.commandInvoker.execute(command);
   }
 
   /**
    * Cancela un servicio
-   * Usa State Pattern para validar la transición
+   * Usa Command Pattern para encapsular la operación con capacidad de undo
    */
   async cancelarServicio(id: number): Promise<ServicioAlquiler> {
-    const servicio = await this.buscarPorId(id);
+    // Crear comando usando Factory
+    const command = this.commandFactory.createCancelarServicioCommand(id);
 
-    // Usar State Pattern para la transición (validará automáticamente)
-    await this.stateContext.cancelar(servicio);
+    // Ejecutar comando a través del Invoker
+    return await this.commandInvoker.execute(command);
+  }
 
-    // Liberar prendas
-    await this.liberarPrendas(servicio.prendas.map((p) => p.id));
+  /**
+   * Deshace la última operación de cambio de estado
+   * Utiliza el historial de comandos del Command Pattern
+   */
+  async deshacerUltimaOperacion(): Promise<void> {
+    return await this.commandInvoker.undo();
+  }
 
-    // Actualizar estado a cancelado
-    return await this.servicioRepository.actualizar(id, {
-      estado: servicio.estado,
-    });
+  /**
+   * Rehace la última operación deshecha
+   * Utiliza el historial de comandos del Command Pattern
+   */
+  async rehacerOperacion(): Promise<void> {
+    return await this.commandInvoker.redo();
+  }
+
+  /**
+   * Obtiene el historial de comandos ejecutados
+   */
+  obtenerHistorialComandos() {
+    return this.commandInvoker.getHistory();
+  }
+
+  /**
+   * Verifica si se puede deshacer una operación
+   */
+  puedeDeshacerOperacion(): boolean {
+    return this.commandInvoker.canUndo();
+  }
+
+  /**
+   * Verifica si se puede rehacer una operación
+   */
+  puedeRehacerOperacion(): boolean {
+    return this.commandInvoker.canRedo();
   }
 
   /**

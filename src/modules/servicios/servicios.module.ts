@@ -8,33 +8,7 @@ import { Cliente } from '../clientes/entities/cliente.entity';
 import { Empleado } from '../empleados/entities/empleado.entity';
 import { Prenda } from '../prendas/entities/prenda.entity';
 import { CreationalPatternsModule } from '../../patterns/creational/creational-patterns.module';
-// State Pattern imports
-import {
-  ServicioStateContext,
-  PendingState,
-  ConfirmedState,
-  DeliveredState,
-  ReturnedState,
-  CancelledState,
-} from '../../patterns/behavioral/state';
-// Strategy Pattern imports
-import {
-  PricingStrategyContext,
-  RegularPricingStrategy,
-  VipPricingStrategy,
-  SeasonalPricingStrategy,
-  BulkPricingStrategy,
-  PromotionalPricingStrategy,
-} from '../../patterns/behavioral/strategy';
-// Observer Pattern imports
-import {
-  ServicioSubject,
-  EmailNotificationObserver,
-  SmsNotificationObserver,
-  AuditLogObserver,
-  DashboardObserver,
-  ReportGeneratorObserver,
-} from '../../patterns/behavioral/observer';
+import { BehavioralPatternsModule } from '../../patterns/behavioral/behavioral-patterns.module';
 
 /**
  * ServiciosModule - Módulo de gestión de servicios de alquiler
@@ -45,44 +19,24 @@ import {
  * - State Pattern para gestión del ciclo de vida del servicio
  * - Strategy Pattern para cálculo flexible de precios
  * - Observer Pattern para notificaciones de eventos
+ * - Command Pattern para encapsular operaciones con capacidad de undo/redo
  */
 @Module({
   imports: [
     TypeOrmModule.forFeature([ServicioAlquiler, Cliente, Empleado, Prenda]),
     // Importar módulo de patrones creacionales para usar Builder y Singleton
     CreationalPatternsModule,
+    // Importar módulo de patrones de comportamiento
+    BehavioralPatternsModule,
   ],
   controllers: [ServiciosController],
   providers: [
     ServiciosService,
     ServicioRepository,
-    // State Pattern providers
-    ServicioStateContext,
-    PendingState,
-    ConfirmedState,
-    DeliveredState,
-    ReturnedState,
-    CancelledState,
-    // Strategy Pattern providers
-    PricingStrategyContext,
-    RegularPricingStrategy,
-    VipPricingStrategy,
-    SeasonalPricingStrategy,
-    BulkPricingStrategy,
-    PromotionalPricingStrategy,
-    // Observer Pattern providers
-    ServicioSubject,
-    EmailNotificationObserver,
-    SmsNotificationObserver,
-    AuditLogObserver,
-    DashboardObserver,
-    ReportGeneratorObserver,
   ],
   exports: [
     ServiciosService,
     ServicioRepository,
-    ServicioStateContext,
-    PricingStrategyContext,
   ],
 })
 export class ServiciosModule {}

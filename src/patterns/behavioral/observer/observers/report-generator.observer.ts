@@ -60,7 +60,7 @@ export class ReportGeneratorObserver implements IServicioObserver {
       id: this.generarIdReporte(),
       tipo: this.determinarTipoReporte(tipo),
       fechaGeneracion: timestamp,
-      servicioNumero: servicio.numero,
+      servicioNumero: servicio.numero.toString(),
       contenido: '',
     };
 

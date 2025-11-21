@@ -7,7 +7,7 @@ API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (v
 - **Patrones de Diseño Implementados:**
   - **Creacionales**: Factory Method, Builder, Singleton
   - **Estructurales**: Decorator, Repository, Adapter, Composite, Facade
-  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios), Observer (notificaciones de eventos)
+  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios), Observer (notificaciones de eventos), Command (operaciones con undo/redo)
 
 - **Módulos:**
   - Gestión de Prendas (vestidos, trajes, disfraces)
@@ -146,7 +146,7 @@ los-atuendos/
 │   ├── patterns/            # Implementación de patrones de diseño
 │   │   ├── creational/      # Factory, Builder, Singleton
 │   │   ├── structural/      # Decorator, Repository, Adapter, Composite, Facade
-│   │   └── behavioral/      # State, Strategy, Observer
+│   │   └── behavioral/      # State, Strategy, Observer, Command
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
@@ -220,6 +220,40 @@ Sistema de notificaciones desacoplado que permite a múltiples observadores reac
 - **ReportGeneratorObserver**: Genera reportes automáticos al completar o cancelar servicios
 
 **Integración:** Se integra automáticamente con el State Pattern, notificando eventos en cada transición de estado.
+
+### Command Pattern
+
+**Ubicación**: `src/patterns/behavioral/command/`
+
+Encapsula operaciones de cambio de estado como objetos independientes, permitiendo **deshacer (undo)** y **rehacer (redo)** operaciones, mantener historial completo de comandos ejecutados y proporcionar trazabilidad para auditoría.
+
+**Comandos Implementados:**
+- **ConfirmarServicioCommand**: Transiciona servicio de pendiente → confirmado
+- **EntregarServicioCommand**: Transiciona servicio de confirmado → entregado
+- **DevolverServicioCommand**: Transiciona servicio de entregado → devuelto (registra fecha de devolución)
+- **CancelarServicioCommand**: Cancela servicio y libera prendas asociadas
+
+**Componentes:**
+- **CommandInvoker**: Ejecuta comandos y gestiona el historial (máximo 50 comandos)
+- **CommandHistory**: Mantiene historial con stack de undo/redo y metadata de ejecución
+- **CommandFactory**: Crea comandos con dependencias inyectadas
+
+**Funcionalidades:**
+```typescript
+// Ejecutar comando
+await serviciosService.confirmarServicio(id);
+
+// Deshacer última operación
+await serviciosService.deshacerUltimaOperacion();
+
+// Rehacer operación deshecha
+await serviciosService.rehacerOperacion();
+
+// Obtener historial de comandos
+const historial = serviciosService.obtenerHistorialComandos();
+```
+
+**Integración:** Utiliza State Pattern para validar transiciones de estado y Observer Pattern para notificar eventos automáticamente.
 
 ## Solución de Problemas
 

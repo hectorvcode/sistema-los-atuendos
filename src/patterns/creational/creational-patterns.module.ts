@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BehavioralPatternsModule } from '../behavioral/behavioral-patterns.module';
 
 // Entidades
 import { VestidoDama } from '../../modules/prendas/entities/vestido-dama.entity';
@@ -39,6 +40,8 @@ import { DemoPatternsService } from './demo/demo-patterns.service';
       // Entidad de consecutivos
       Consecutivo,
     ]),
+    // Importar patrones de comportamiento para acceso a PricingStrategyContext
+    BehavioralPatternsModule,
   ],
   providers: [
     // Factory Pattern
