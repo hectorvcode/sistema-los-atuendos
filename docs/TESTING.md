@@ -56,6 +56,36 @@ Este documento describe la estrategia de testing implementada en el proyecto Los
    npm install
    ```
 
+2. **MySQL en Ejecución**
+   - Iniciar XAMPP o MySQL Server
+   - Asegurar que el puerto 3306 está disponible
+
+3. **Base de Datos de Test Configurada**
+   ```bash
+   # Crear base de datos de test (solo primera vez)
+   mysql -u root -p -e "CREATE DATABASE los_atuendos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+
+4. **Archivo de Configuración `.env.test`**
+
+   El proyecto ya incluye este archivo con la configuración:
+   ```env
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USERNAME=root
+   DB_PASSWORD=
+   DB_NAME=los_atuendos_test
+   NODE_ENV=test
+   ```
+
+### Configuración Importante
+
+Los tests están configurados para ejecutarse **secuencialmente** (`--runInBand`) para evitar conflictos de concurrencia con MySQL. Esto significa que:
+
+- Los tests se ejecutan uno después del otro (no en paralelo)
+- La base de datos se limpia automáticamente entre cada test suite (`dropSchema: true`)
+- El tiempo de ejecución es de aproximadamente 55 segundos para todos los tests
+
 ### Estructura de Archivos
 
 ```
@@ -437,13 +467,170 @@ npm run db:reset
 
 ---
 
+## Instrucciones Paso a Paso para Ejecutar Tests
+
+### Primera Vez (Configuración Inicial)
+
+1. **Verificar que MySQL está corriendo**
+   ```bash
+   # Windows (XAMPP)
+   # Iniciar XAMPP Control Panel y arrancar MySQL
+
+   # O verificar con:
+   mysql -u root -p -e "SELECT 1;"
+   ```
+
+2. **Crear base de datos de test**
+   ```bash
+   mysql -u root -p -e "CREATE DATABASE los_atuendos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+
+3. **Verificar archivo .env.test**
+   ```bash
+   # El archivo ya debe existir en la raíz del proyecto
+   # Verificar que contenga:
+   cat .env.test
+   ```
+
+4. **Instalar dependencias (si no se ha hecho)**
+   ```bash
+   npm install
+   ```
+
+### Ejecutar Tests (Uso Regular)
+
+1. **Ejecutar todos los tests**
+   ```bash
+   npm run test:all
+   ```
+
+   Esto ejecutará:
+   - 17 test suites
+   - 280 tests
+   - Duración: ~55 segundos
+
+2. **Ver resultado esperado**
+   ```
+   Test Suites: 17 passed, 17 total
+   Tests:       280 passed, 280 total
+   Snapshots:   0 total
+   Time:        54.844 s
+   ```
+
+3. **Generar reporte de cobertura**
+   ```bash
+   npm run test:all:cov
+
+   # Abrir reporte en navegador
+   start coverage/index.html  # Windows
+   open coverage/index.html   # Mac/Linux
+   ```
+
+### Tests Específicos
+
+```bash
+# Por patrón individual
+npm run test:factory     # Solo Factory Pattern
+npm run test:builder     # Solo Builder Pattern
+npm run test:singleton   # Solo Singleton Pattern
+
+# Por categoría
+npm run test:creational  # Todos los creacionales con cobertura
+npm run test:structural  # Todos los estructurales con cobertura
+```
+
+### Desarrollo con Tests
+
+```bash
+# Modo watch (re-ejecuta tests al cambiar archivos)
+npm run test:unit:watch
+
+# Filtrar por nombre de archivo
+npm run test -- --testNamePattern="Factory"
+
+# Ver solo tests que fallaron
+npm run test -- --onlyFailures
+```
+
+---
+
 ## Resumen de Testing
 
-### Estadísticas
+### Estadísticas Actualizadas
 
-- **Tests Unitarios**: 177+ tests (incluye 37 tests de State Pattern)
+- **Tests Totales**: 280 tests
+- **Test Suites**: 17
 - **Cobertura Total**: ~85%
-- **Patrones Validados**: 8 patrones de diseño
-  - **Creacionales**: Factory Method, Builder, Singleton
-  - **Estructurales**: Decorator, Adapter, Composite, Facade
-  - **Comportamiento**: State
+- **Tiempo de Ejecución**: ~55 segundos (secuencial)
+- **Tasa de Éxito**: 100% ✅
+
+### Patrones Validados
+
+**11 patrones de diseño totalmente testeados:**
+
+- **Creacionales (3)**:
+  - Factory Method Pattern
+  - Builder Pattern
+  - Singleton Pattern
+
+- **Estructurales (5)**:
+  - Decorator Pattern
+  - Adapter Pattern
+  - Composite Pattern
+  - Facade Pattern
+  - Repository Pattern
+
+- **Comportamiento (4)**:
+  - State Pattern (37 tests)
+  - Strategy Pattern
+  - Observer Pattern
+  - Command Pattern
+
+### Configuración de Tests
+
+**Base de Datos:**
+- Motor: MySQL 8.x
+- Base de datos de test: `los_atuendos_test`
+- Estrategia: `dropSchema: true` (limpieza automática)
+
+**Ejecución:**
+- Modo: Secuencial (`--runInBand`)
+- Timeout: 30000ms (30 segundos por test)
+- Framework: Jest 30.x
+
+**Características:**
+- ✅ Validación completa de patrones de diseño
+- ✅ Tests de integración con base de datos real
+- ✅ Cobertura de código automatizada
+- ✅ Limpieza automática entre tests
+- ✅ Mocks configurados para dependencias externas
+- ✅ Validación de reglas de negocio
+
+---
+
+## Buenas Prácticas Aplicadas
+
+1. **Aislamiento de Tests**
+   - Cada test suite crea y limpia su propio entorno
+   - No hay dependencias entre tests
+   - Base de datos se limpia automáticamente
+
+2. **Naming Conventions**
+   - Tests descriptivos que documentan el comportamiento
+   - Uso de `should`, `debe`, `can`, etc.
+   - Agrupación lógica con `describe`
+
+3. **Ejecución Secuencial**
+   - Evita conflictos de concurrencia
+   - Mejor trazabilidad de errores
+   - Resultados consistentes
+
+4. **Configuración Separada**
+   - `.env.test` para configuración de tests
+   - Base de datos separada (`los_atuendos_test`)
+   - Evita afectar datos de desarrollo
+
+5. **Cobertura de Código**
+   - Reportes HTML visuales
+   - Métricas de cobertura por archivo
+   - Identificación de código no testeado

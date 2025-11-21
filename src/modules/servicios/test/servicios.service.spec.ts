@@ -7,11 +7,18 @@ import { CreateServicioAlquilerDto } from '../dto';
 import { ServicioAlquiler } from '../entities/servicio-alquiler.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Prenda } from '../../prendas/entities/prenda.entity';
+import { ServicioStateContext } from '../../../patterns/behavioral/state/servicio-state-context';
+import { CommandInvoker } from '../../../patterns/behavioral/command/command-invoker';
+import { CommandFactory } from '../../../patterns/behavioral/command/command.factory';
+import { ServicioSubject } from '../../../patterns/behavioral/observer/servicio-subject';
 
 describe('ServiciosService', () => {
   let service: ServiciosService;
   let repository: ServicioRepository;
   let builder: ServicioAlquilerBuilder;
+  let module: TestingModule;
+  let commandFactory: CommandFactory;
+  let commandInvoker: CommandInvoker;
 
   const mockServicioRepository = {
     buscarPorId: jest.fn(),
@@ -39,7 +46,7 @@ describe('ServiciosService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         ServiciosService,
         {
@@ -55,12 +62,14 @@ describe('ServiciosService', () => {
           useValue: mockPrendaRepository,
         },
         {
-          provide: 'ServicioStateContext',
+          provide: ServicioStateContext,
           useValue: {
             confirmar: jest.fn(),
             entregar: jest.fn(),
             devolver: jest.fn(),
             cancelar: jest.fn(),
+            puedeModificar: jest.fn().mockReturnValue(true),
+            puedeEliminar: jest.fn().mockReturnValue(true),
             obtenerInformacionEstado: jest.fn().mockReturnValue({
               estadoActual: 'pendiente',
               puedeModificar: true,
@@ -70,7 +79,27 @@ describe('ServiciosService', () => {
           },
         },
         {
-          provide: 'ServicioSubject',
+          provide: CommandInvoker,
+          useValue: {
+            execute: jest.fn(),
+            undo: jest.fn(),
+            redo: jest.fn(),
+            canUndo: jest.fn().mockReturnValue(false),
+            canRedo: jest.fn().mockReturnValue(false),
+            getHistory: jest.fn().mockReturnValue([]),
+          },
+        },
+        {
+          provide: CommandFactory,
+          useValue: {
+            createConfirmarServicioCommand: jest.fn(),
+            createEntregarServicioCommand: jest.fn(),
+            createDevolverServicioCommand: jest.fn(),
+            createCancelarServicioCommand: jest.fn(),
+          },
+        },
+        {
+          provide: ServicioSubject,
           useValue: {
             notify: jest.fn(),
           },
@@ -81,6 +110,8 @@ describe('ServiciosService', () => {
     service = module.get<ServiciosService>(ServiciosService);
     repository = module.get<ServicioRepository>(ServicioRepository);
     builder = module.get<ServicioAlquilerBuilder>(ServicioAlquilerBuilder);
+    commandFactory = module.get<CommandFactory>(CommandFactory);
+    commandInvoker = module.get<CommandInvoker>(CommandInvoker);
 
     jest.clearAllMocks();
   });
@@ -189,25 +220,25 @@ describe('ServiciosService', () => {
   });
 
   describe('cancelarServicio', () => {
-    it('debería cancelar un servicio y liberar prendas', async () => {
-      const servicio = new ServicioAlquiler();
-      servicio.id = 1;
-      servicio.estado = 'confirmado';
-      servicio.prendas = [{ id: 1 } as Prenda, { id: 2 } as Prenda];
+    it('debería cancelar un servicio usando Command Pattern', async () => {
+      const servicioCancelado = new ServicioAlquiler();
+      servicioCancelado.id = 1;
+      servicioCancelado.estado = 'cancelado';
+      servicioCancelado.prendas = [{ id: 1 } as Prenda, { id: 2 } as Prenda];
 
-      mockServicioRepository.buscarPorId.mockResolvedValue(servicio);
-      mockServicioRepository.actualizar.mockResolvedValue({
-        ...servicio,
-        estado: 'cancelado',
-      });
+      const mockCommand = {
+        execute: jest.fn().mockResolvedValue(servicioCancelado),
+        undo: jest.fn(),
+      };
+
+      (commandFactory.createCancelarServicioCommand as jest.Mock).mockReturnValue(mockCommand);
+      (commandInvoker.execute as jest.Mock).mockResolvedValue(servicioCancelado);
 
       const resultado = await service.cancelarServicio(1);
 
       expect(resultado.estado).toBe('cancelado');
-      expect(mockPrendaRepository.update).toHaveBeenCalledTimes(2);
-      expect(mockServicioRepository.actualizar).toHaveBeenCalledWith(1, {
-        estado: 'cancelado',
-      });
+      expect(commandFactory.createCancelarServicioCommand).toHaveBeenCalledWith(1);
+      expect(commandInvoker.execute).toHaveBeenCalledWith(mockCommand);
     });
   });
 });

@@ -18,13 +18,13 @@ export class ItemLavanderia extends BaseEntity {
   estado: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',
   })
   fechaRegistro: Date;
 
   @Column({
-    type: 'timestamp',
+    type: 'datetime',
     nullable: true,
   })
   fechaEnvio: Date;

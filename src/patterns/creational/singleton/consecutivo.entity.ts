@@ -15,9 +15,8 @@ export class Consecutivo {
   ultimoNumero: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
   })
   ultimaActualizacion: Date;
 }

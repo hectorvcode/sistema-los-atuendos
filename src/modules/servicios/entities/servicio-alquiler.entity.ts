@@ -20,7 +20,7 @@ export class ServicioAlquiler extends BaseEntity {
   numero: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',
   })
   fechaSolicitud: Date;

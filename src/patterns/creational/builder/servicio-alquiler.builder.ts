@@ -168,12 +168,13 @@ export class ServicioAlquilerBuilder implements IServicioAlquilerBuilder {
       errores.push('Debe seleccionar al menos una prenda');
     }
 
-    // Validar disponibilidad de prendas
-    await this.validarDisponibilidadPrendas();
-
+    // Lanzar errores de validación básica primero
     if (errores.length > 0) {
       throw new Error(`Error de validación: ${errores.join(', ')}`);
     }
+
+    // Validar disponibilidad de prendas (requiere consulta a BD)
+    await this.validarDisponibilidadPrendas();
   }
 
   private async cargarCliente(): Promise<Cliente> {

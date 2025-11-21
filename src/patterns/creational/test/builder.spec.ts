@@ -11,6 +11,7 @@ import { Prenda } from '../../../modules/prendas/entities/prenda.entity';
 import { GeneradorConsecutivo } from '../singleton/generador-consecutivo.singleton';
 import { Consecutivo } from '../singleton/consecutivo.entity';
 import { getDatabaseConfig } from '../../../config/database.config';
+import { PricingStrategyContext } from '../../behavioral/strategy/pricing-context';
 
 describe('Builder Pattern', () => {
   let module: TestingModule;
@@ -39,7 +40,25 @@ describe('Builder Pattern', () => {
           Consecutivo,
         ]),
       ],
-      providers: [ServicioAlquilerBuilder, GeneradorConsecutivo],
+      providers: [
+        ServicioAlquilerBuilder,
+        GeneradorConsecutivo,
+        {
+          provide: PricingStrategyContext,
+          useValue: {
+            calcularMejorPrecio: jest.fn().mockReturnValue({
+              precioBase: 100,
+              descuento: 0,
+              precioFinal: 100,
+              detalles: 'Precio calculado para test',
+            }),
+            getEstrategiaActual: jest.fn().mockReturnValue({
+              getNombre: jest.fn().mockReturnValue('Estrategia de Test'),
+            }),
+            setEstrategia: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     builder = module.get<ServicioAlquilerBuilder>(ServicioAlquilerBuilder);

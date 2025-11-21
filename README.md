@@ -122,13 +122,73 @@ npm run seed:complete      # Cargar datos de prueba completos
 npm run db:reset           # Limpiar BD y recargar datos
 
 # Testing
-npm run test               # Ejecutar tests unitarios
-npm run test:cov           # Generar reporte de cobertura
+npm run test:all           # Ejecutar TODOS los tests (recomendado)
+npm run test:all:cov       # Ejecutar todos los tests con cobertura
+npm run test:unit          # Ejecutar solo tests unitarios
+npm run test:unit:cov      # Tests unitarios con cobertura
+npm run test:patterns      # Tests de patrones de diseño con cobertura
 
 # Linting
 npm run lint               # Ejecutar ESLint
 npm run format             # Formatear código con Prettier
 ```
+
+## Testing
+
+El proyecto cuenta con una suite completa de tests unitarios que validan la correcta implementación de todos los patrones de diseño.
+
+### Requisitos Previos para Tests
+
+1. **MySQL debe estar corriendo** (XAMPP o MySQL Server)
+2. **Base de datos de test configurada**:
+   ```bash
+   # Crear base de datos de test (solo primera vez)
+   mysql -u root -p -e "CREATE DATABASE los_atuendos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+
+### Ejecutar Tests
+
+```bash
+# 1. Ejecutar TODOS los tests (recomendado)
+npm run test:all
+
+# 2. Ver reporte de cobertura
+npm run test:all:cov
+# El reporte se genera en: coverage/index.html
+
+# 3. Tests en modo watch (desarrollo)
+npm run test:unit:watch
+```
+
+### Tests por Categoría
+
+```bash
+# Patrones Creacionales
+npm run test:factory        # Factory Method Pattern
+npm run test:builder        # Builder Pattern
+npm run test:singleton      # Singleton Pattern
+
+# Patrones Estructurales
+npm run test:decorator      # Decorator Pattern
+npm run test:adapter        # Adapter Pattern
+npm run test:composite      # Composite Pattern
+npm run test:facade         # Facade Pattern
+
+# Patrones de Comportamiento
+npm run test -- state       # State Pattern
+npm run test -- strategy    # Strategy Pattern
+npm run test -- observer    # Observer Pattern
+npm run test -- command     # Command Pattern
+```
+
+### Estadísticas de Tests
+
+- **Total**: 280 tests
+- **Test Suites**: 17
+- **Cobertura**: ~85%
+- **Tiempo de ejecución**: ~55 segundos
+
+**Para más información detallada sobre testing**, consultar: [docs/TESTING.md](docs/TESTING.md)
 
 ## Estructura del Proyecto
 
