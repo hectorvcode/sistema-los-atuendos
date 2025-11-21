@@ -84,7 +84,9 @@ Los tests están configurados para ejecutarse **secuencialmente** (`--runInBand`
 
 - Los tests se ejecutan uno después del otro (no en paralelo)
 - La base de datos se limpia automáticamente entre cada test suite (`dropSchema: true`)
-- El tiempo de ejecución es de aproximadamente 55 segundos para todos los tests
+- El tiempo de ejecución es de aproximadamente 40-55 segundos para todos los tests
+- Todos los comandos de test incluyen `cross-env NODE_ENV=test` para usar la base de datos de test
+- La ejecución secuencial previene errores de foreign key y conflictos de esquema
 
 ### Estructura de Archivos
 
@@ -355,7 +357,11 @@ npm run test:composite      # Composite
 npm run test:facade         # Facade
 
 # Patrones de Comportamiento
-npm run test -- servicio-state.spec  # State Pattern
+npm run test:behavioral     # Todos los de comportamiento
+npm run test:command        # Command Pattern
+npm run test:observer       # Observer Pattern
+npm run test:strategy       # Strategy Pattern
+npm run test:state          # State Pattern
 
 # Todos los patrones
 npm run test:patterns
@@ -381,10 +387,16 @@ npm run test:all:cov
 
 ```bash
 # Windows
-start coverage/index.html
+start coverage/lcov-report/index.html
+
+# O con PowerShell
+Invoke-Item coverage/lcov-report/index.html
 
 # Linux/Mac
-open coverage/index.html
+open coverage/lcov-report/index.html
+
+# O con xdg-open (Linux)
+xdg-open coverage/lcov-report/index.html
 ```
 
 ### Configuración de Cobertura
@@ -464,6 +476,30 @@ npm install
 # Limpiar manualmente la base de datos
 npm run db:reset
 ```
+
+### Problema 5: "Can't DROP FOREIGN KEY" o tests usan base de datos incorrecta
+
+**Causa**: Tests ejecutándose en paralelo sin `--runInBand` o sin `cross-env NODE_ENV=test`
+
+**Síntomas**:
+- Error: `Can't DROP FOREIGN KEY 'FK_...'`
+- Tests intentan conectarse a `los_atuendos` en vez de `los_atuendos_test`
+- Test Suites fallan de forma intermitente
+
+**Solución**:
+
+Todos los comandos de test en `package.json` deben incluir:
+1. `cross-env NODE_ENV=test` - Para usar la base de datos de test
+2. `--runInBand` - Para ejecución secuencial
+
+```json
+{
+  "test:creational": "cross-env NODE_ENV=test jest src/patterns/creational/ --coverage --runInBand",
+  "test:structural": "cross-env NODE_ENV=test jest src/patterns/structural/ --coverage --runInBand"
+}
+```
+
+Si modificas los scripts de test, asegúrate de incluir ambos flags para evitar conflictos de concurrencia.
 
 ---
 

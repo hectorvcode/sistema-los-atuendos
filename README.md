@@ -154,7 +154,7 @@ npm run test:all
 
 # 2. Ver reporte de cobertura
 npm run test:all:cov
-# El reporte se genera en: coverage/index.html
+# El reporte se genera en: coverage/lcov-report/index.html
 
 # 3. Tests en modo watch (desarrollo)
 npm run test:unit:watch
@@ -175,10 +175,11 @@ npm run test:composite      # Composite Pattern
 npm run test:facade         # Facade Pattern
 
 # Patrones de Comportamiento
-npm run test -- state       # State Pattern
-npm run test -- strategy    # Strategy Pattern
-npm run test -- observer    # Observer Pattern
-npm run test -- command     # Command Pattern
+npm run test:behavioral     # Todos los de comportamiento
+npm run test:state          # State Pattern
+npm run test:strategy       # Strategy Pattern
+npm run test:observer       # Observer Pattern
+npm run test:command        # Command Pattern
 ```
 
 ### Estadísticas de Tests
