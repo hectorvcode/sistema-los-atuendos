@@ -44,6 +44,11 @@ Este documento describe la estrategia de testing implementada en el proyecto Los
 - Composite Pattern (Gestión de conjuntos)
 - Facade Pattern (Simplificación de operaciones)
 - State Pattern (Gestión de estados de servicios)
+- Strategy Pattern (Estrategias de cálculo de precios)
+- Observer Pattern (Sistema de notificaciones)
+- Command Pattern (Operaciones con undo/redo)
+- Chain of Responsibility Pattern (Aprobaciones jerárquicas)
+- Template Method Pattern (Generación de reportes)
 
 ---
 
@@ -362,6 +367,8 @@ npm run test:command        # Command Pattern
 npm run test:observer       # Observer Pattern
 npm run test:strategy       # Strategy Pattern
 npm run test:state          # State Pattern
+npm run test:chain          # Chain of Responsibility Pattern
+npm run test:template       # Template Method Pattern
 
 # Todos los patrones
 npm run test:patterns
@@ -541,16 +548,16 @@ Si modificas los scripts de test, asegúrate de incluir ambos flags para evitar 
    ```
 
    Esto ejecutará:
-   - 17 test suites
-   - 280 tests
-   - Duración: ~55 segundos
+   - 19 test suites
+   - 322 tests
+   - Duración: ~60 segundos
 
 2. **Ver resultado esperado**
    ```
-   Test Suites: 17 passed, 17 total
-   Tests:       280 passed, 280 total
+   Test Suites: 19 passed, 19 total
+   Tests:       322 passed, 322 total
    Snapshots:   0 total
-   Time:        54.844 s
+   Time:        ~60 s
    ```
 
 3. **Generar reporte de cobertura**
@@ -594,15 +601,15 @@ npm run test -- --onlyFailures
 
 ### Estadísticas Actualizadas
 
-- **Tests Totales**: 280 tests
-- **Test Suites**: 17
+- **Tests Totales**: 322 tests
+- **Test Suites**: 19
 - **Cobertura Total**: ~85%
-- **Tiempo de Ejecución**: ~55 segundos (secuencial)
+- **Tiempo de Ejecución**: ~60 segundos (secuencial)
 - **Tasa de Éxito**: 100% ✅
 
 ### Patrones Validados
 
-**11 patrones de diseño totalmente testeados:**
+**13 patrones de diseño totalmente testeados:**
 
 - **Creacionales (3)**:
   - Factory Method Pattern
@@ -616,11 +623,13 @@ npm run test -- --onlyFailures
   - Facade Pattern
   - Repository Pattern
 
-- **Comportamiento (4)**:
+- **Comportamiento (6)**:
   - State Pattern (37 tests)
   - Strategy Pattern
   - Observer Pattern
   - Command Pattern
+  - Chain of Responsibility Pattern (19 tests)
+  - Template Method Pattern (23 tests)
 
 ### Configuración de Tests
 

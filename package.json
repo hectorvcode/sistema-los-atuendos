@@ -36,6 +36,8 @@
     "test:observer": "cross-env NODE_ENV=test jest src/patterns/behavioral/observer/test/ --runInBand",
     "test:strategy": "cross-env NODE_ENV=test jest src/patterns/behavioral/strategy/test/ --runInBand",
     "test:state": "cross-env NODE_ENV=test jest src/patterns/behavioral/state/test/ --runInBand",
+    "test:chain": "cross-env NODE_ENV=test jest src/patterns/behavioral/chain-of-responsibility/test/ --runInBand",
+    "test:template": "cross-env NODE_ENV=test jest src/patterns/behavioral/template-method/test/ --runInBand",
     "test:all": "npm run test:unit",
     "test:all:cov": "npm run test:unit:cov",
     "seed:run": "ts-node src/database/seeds/run-seeds.ts",

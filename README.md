@@ -7,7 +7,7 @@ API RESTful desarrollada con NestJS para la gestión de alquiler de vestuario (v
 - **Patrones de Diseño Implementados:**
   - **Creacionales**: Factory Method, Builder, Singleton
   - **Estructurales**: Decorator, Repository, Adapter, Composite, Facade
-  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios), Observer (notificaciones de eventos), Command (operaciones con undo/redo)
+  - **Comportamiento**: State (gestión de ciclo de vida), Strategy (cálculo de precios), Observer (notificaciones de eventos), Command (operaciones con undo/redo), Chain of Responsibility (aprobaciones jerárquicas), Template Method (generación de reportes)
 
 - **Módulos:**
   - Gestión de Prendas (vestidos, trajes, disfraces)
@@ -180,12 +180,14 @@ npm run test:state          # State Pattern
 npm run test:strategy       # Strategy Pattern
 npm run test:observer       # Observer Pattern
 npm run test:command        # Command Pattern
+npm run test:chain          # Chain of Responsibility Pattern
+npm run test:template       # Template Method Pattern
 ```
 
 ### Estadísticas de Tests
 
-- **Total**: 280 tests
-- **Test Suites**: 17
+- **Total**: 322 tests
+- **Test Suites**: 19
 - **Cobertura**: ~85%
 - **Tiempo de ejecución**: ~55 segundos
 
@@ -207,7 +209,7 @@ los-atuendos/
 │   ├── patterns/            # Implementación de patrones de diseño
 │   │   ├── creational/      # Factory, Builder, Singleton
 │   │   ├── structural/      # Decorator, Repository, Adapter, Composite, Facade
-│   │   └── behavioral/      # State, Strategy, Observer, Command
+│   │   └── behavioral/      # State, Strategy, Observer, Command, Chain of Responsibility, Template Method
 │   ├── app.module.ts
 │   └── main.ts
 ├── postman/                 # Colección de Postman y documentación
@@ -315,6 +317,105 @@ const historial = serviciosService.obtenerHistorialComandos();
 ```
 
 **Integración:** Utiliza State Pattern para validar transiciones de estado y Observer Pattern para notificar eventos automáticamente.
+
+### Chain of Responsibility Pattern
+
+**Ubicación**: `src/patterns/behavioral/chain-of-responsibility/`
+
+Implementa un sistema jerárquico de aprobación de servicios basado en el valor total de la transacción. Cada nivel de autoridad (handler) decide si puede aprobar la solicitud o si debe escalarla al siguiente nivel en la cadena.
+
+**Niveles de Autoridad:**
+- **Empleado**: Aprueba hasta $500,000
+- **Supervisor**: Aprueba hasta $2,000,000 (requiere documentación adicional para valores > $1,500,000)
+- **Gerente**: Aprueba hasta $5,000,000 (requiere seguro adicional para valores > $4,000,000)
+- **Director**: Autoridad ilimitada (requiere notificación a junta directiva para valores > $20,000,000)
+
+**Componentes:**
+- **AbstractApprovalHandler**: Clase base que implementa la lógica de encadenamiento
+- **IApprovalHandler**: Interfaz que define el contrato de los handlers
+- **ApprovalChainService**: Servicio que configura y gestiona la cadena de aprobación
+- **Handlers Concretos**: EmpleadoApprovalHandler, SupervisorApprovalHandler, GerenteApprovalHandler, DirectorApprovalHandler
+
+**Funcionalidades:**
+```typescript
+// Procesar aprobación desde el inicio de la cadena
+const resultado = await approvalChainService.processApproval(
+  servicio,
+  'Juan Pérez',
+  'Evento corporativo importante'
+);
+
+// Procesar aprobación desde un nivel específico
+const resultado = await approvalChainService.processApprovalFromLevel(
+  servicio,
+  'María González',
+  AuthorityLevel.SUPERVISOR
+);
+
+// Obtener límites de aprobación
+const limits = approvalChainService.getApprovalLimits();
+
+// Determinar nivel de autoridad requerido
+const nivelRequerido = approvalChainService.getRequiredAuthorityLevel(3500000);
+```
+
+**Integración:** El patrón está disponible a través del `ChainOfResponsibilityModule` y puede integrarse con el módulo de servicios para validar aprobaciones antes de confirmar servicios de alto valor.
+
+### Template Method Pattern
+
+**Ubicación**: `src/patterns/behavioral/template-method/`
+
+Define el esqueleto de un algoritmo de generación de reportes de servicios, permitiendo que las subclases redefinan ciertos pasos del algoritmo sin cambiar su estructura. El template method (`generateReport`) ejecuta una secuencia fija de pasos donde algunos son implementados en la clase abstracta y otros son delegados a las subclases concretas.
+
+**Pasos del Algoritmo** (Template Method):
+1. **Validar datos** - Implementación por defecto, puede ser sobrescrita
+2. **Preparar y filtrar datos** - Implementación por defecto con soporte de filtros
+3. **Calcular estadísticas** - Implementación común (raramente sobrescrita)
+4. **Formatear encabezado** - ⚠️ Método abstracto (debe implementarse)
+5. **Formatear contenido** - ⚠️ Método abstracto (debe implementarse)
+6. **Formatear pie de página** - Implementación por defecto, puede personalizarse
+7. **Generar archivo final** - ⚠️ Método abstracto (debe implementarse)
+8. **Post-generación** - Hook opcional para lógica adicional
+
+**Generadores Implementados:**
+- **JsonReportGenerator**: Genera reportes en formato JSON con estructura completa
+- **CsvReportGenerator**: Genera reportes tabulares en formato CSV
+- **HtmlReportGenerator**: Genera reportes web con estilos responsive
+
+**Componentes:**
+- **AbstractReportGenerator**: Clase abstracta base que define el template method
+- **ReportGenerationService**: Servicio que gestiona los diferentes generadores
+- **IReportData/IReportResult**: Interfaces para datos de entrada y salida
+
+**Funcionalidades:**
+```typescript
+// Generar reporte en formato específico
+const reporteJSON = await reportService.generateReport(
+  ReportFormat.JSON,
+  new Date('2024-01-01'),
+  new Date('2024-01-31'),
+  { estado: 'entregado' }
+);
+
+// Generar múltiples formatos simultáneamente
+const reportes = await reportService.generateMultipleFormats(
+  [ReportFormat.JSON, ReportFormat.CSV, ReportFormat.EXCEL],
+  fechaInicio,
+  fechaFin
+);
+
+// Obtener formatos disponibles
+const formatos = reportService.getAvailableFormats();
+```
+
+**Ventajas del Patrón:**
+- ✅ Algoritmo consistente en todos los formatos
+- ✅ Código reutilizable en la clase base
+- ✅ Fácil agregar nuevos formatos (extensibilidad)
+- ✅ Control centralizado del flujo de generación
+- ✅ Validaciones y estadísticas consistentes
+
+**Integración:** El patrón está disponible a través del `TemplateMethodModule` y puede integrarse con cualquier módulo que necesite generar reportes de servicios en diferentes formatos.
 
 ## Solución de Problemas
 

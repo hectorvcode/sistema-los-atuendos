@@ -40,6 +40,12 @@ import {
   CommandFactory,
 } from './command';
 
+// Chain of Responsibility Pattern
+import { ChainOfResponsibilityModule } from './chain-of-responsibility/chain-of-responsibility.module';
+
+// Template Method Pattern
+import { TemplateMethodModule } from './template-method/template-method.module';
+
 /**
  * BehavioralPatternsModule - Módulo de patrones de comportamiento
  *
@@ -48,11 +54,17 @@ import {
  * - State Pattern para gestión del ciclo de vida
  * - Observer Pattern para notificaciones de eventos
  * - Command Pattern para encapsular operaciones con capacidad de undo/redo
+ * - Chain of Responsibility Pattern para procesamiento de aprobaciones jerárquicas
+ * - Template Method Pattern para generación de reportes en múltiples formatos
  */
 @Module({
   imports: [
     // Importar entidades necesarias para Command Pattern
     TypeOrmModule.forFeature([ServicioAlquiler, Prenda]),
+    // Chain of Responsibility Pattern module
+    ChainOfResponsibilityModule,
+    // Template Method Pattern module
+    TemplateMethodModule,
   ],
   providers: [
     // Strategy Pattern providers
@@ -113,6 +125,12 @@ import {
     CommandInvoker,
     CommandHistory,
     CommandFactory,
+
+    // Chain of Responsibility Pattern exports
+    ChainOfResponsibilityModule,
+
+    // Template Method Pattern exports
+    TemplateMethodModule,
   ],
 })
 export class BehavioralPatternsModule {}
