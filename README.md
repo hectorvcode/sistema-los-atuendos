@@ -107,6 +107,13 @@ Una vez iniciada la aplicación, acceder a:
 
 Para ejecutar las pruebas, ver instrucciones detalladas en: [postman/README.md](postman/README.md)
 
+## 📖 Indice Documentación Detallada
+
+- [Arquitectura del Sistema](docs/ARQUITECTURA.md) - Diseño, patrones y decisiones arquitectónicas
+- [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas de API
+- [Documentación de Testing](docs/TESTING.md) - Tests unitarios y patrones de diseño
+- [Documentación de API REST](docs/API-REST.md) - Endpoints y ejemplos
+
 ## Scripts Disponibles
 
 ```bash
@@ -259,6 +266,7 @@ Gestiona el ciclo de vida de los servicios de alquiler mediante estados bien def
 Ubicación: `src/patterns/behavioral/strategy/`
 
 Calcula el precio de alquiler mediante estrategias intercambiables que se seleccionan automáticamente según el contexto:
+
 - **Regular**: Precio base sin descuentos
 - **VIP**: 15% descuento para clientes VIP
 - **Seasonal**: Descuentos por temporada (Alta 0%, Media 5%, Baja 10%)
@@ -272,10 +280,12 @@ Ubicación: `src/patterns/behavioral/observer/`
 Sistema de notificaciones desacoplado que permite a múltiples observadores reaccionar automáticamente a eventos del sistema:
 
 **Eventos Soportados:**
+
 - SERVICIO_CREADO, SERVICIO_CONFIRMADO, SERVICIO_ENTREGADO
 - SERVICIO_DEVUELTO, SERVICIO_CANCELADO, DEVOLUCION_TARDIA, SERVICIO_MODIFICADO
 
 **Observadores Implementados:**
+
 - **EmailNotificationObserver**: Envía correos electrónicos para eventos importantes
 - **SmsNotificationObserver**: Envía SMS solo para eventos críticos (confirmación, entrega, devolución tardía)
 - **AuditLogObserver**: Registra todos los eventos en logs de auditoría
@@ -291,17 +301,20 @@ Sistema de notificaciones desacoplado que permite a múltiples observadores reac
 Encapsula operaciones de cambio de estado como objetos independientes, permitiendo **deshacer (undo)** y **rehacer (redo)** operaciones, mantener historial completo de comandos ejecutados y proporcionar trazabilidad para auditoría.
 
 **Comandos Implementados:**
+
 - **ConfirmarServicioCommand**: Transiciona servicio de pendiente → confirmado
 - **EntregarServicioCommand**: Transiciona servicio de confirmado → entregado
 - **DevolverServicioCommand**: Transiciona servicio de entregado → devuelto (registra fecha de devolución)
 - **CancelarServicioCommand**: Cancela servicio y libera prendas asociadas
 
 **Componentes:**
+
 - **CommandInvoker**: Ejecuta comandos y gestiona el historial (máximo 50 comandos)
 - **CommandHistory**: Mantiene historial con stack de undo/redo y metadata de ejecución
 - **CommandFactory**: Crea comandos con dependencias inyectadas
 
 **Funcionalidades:**
+
 ```typescript
 // Ejecutar comando
 await serviciosService.confirmarServicio(id);
@@ -318,90 +331,22 @@ const historial = serviciosService.obtenerHistorialComandos();
 
 **Integración:** Utiliza State Pattern para validar transiciones de estado y Observer Pattern para notificar eventos automáticamente.
 
-### Chain of Responsibility Pattern
-
-**Ubicación**: `src/patterns/behavioral/chain-of-responsibility/`
-
-Implementa un sistema jerárquico de aprobación de servicios basado en el valor total de la transacción. Cada nivel de autoridad (handler) decide si puede aprobar la solicitud o si debe escalarla al siguiente nivel en la cadena.
-
-**Niveles de Autoridad:**
-- **Empleado**: Aprueba hasta $500,000
-- **Supervisor**: Aprueba hasta $2,000,000 (requiere documentación adicional para valores > $1,500,000)
-- **Gerente**: Aprueba hasta $5,000,000 (requiere seguro adicional para valores > $4,000,000)
-- **Director**: Autoridad ilimitada (requiere notificación a junta directiva para valores > $20,000,000)
-
-**Componentes:**
-- **AbstractApprovalHandler**: Clase base que implementa la lógica de encadenamiento
-- **IApprovalHandler**: Interfaz que define el contrato de los handlers
-- **ApprovalChainService**: Servicio que configura y gestiona la cadena de aprobación
-- **Handlers Concretos**: EmpleadoApprovalHandler, SupervisorApprovalHandler, GerenteApprovalHandler, DirectorApprovalHandler
-
 **Funcionalidades:**
-```typescript
-// Procesar aprobación desde el inicio de la cadena
-const resultado = await approvalChainService.processApproval(
-  servicio,
-  'Juan Pérez',
-  'Evento corporativo importante'
-);
 
-// Procesar aprobación desde un nivel específico
-const resultado = await approvalChainService.processApprovalFromLevel(
-  servicio,
-  'María González',
-  AuthorityLevel.SUPERVISOR
-);
-
-// Obtener límites de aprobación
-const limits = approvalChainService.getApprovalLimits();
-
-// Determinar nivel de autoridad requerido
-const nivelRequerido = approvalChainService.getRequiredAuthorityLevel(3500000);
-```
-
-**Integración:** El patrón está disponible a través del `ChainOfResponsibilityModule` y puede integrarse con el módulo de servicios para validar aprobaciones antes de confirmar servicios de alto valor.
-
-### Template Method Pattern
-
-**Ubicación**: `src/patterns/behavioral/template-method/`
-
-Define el esqueleto de un algoritmo de generación de reportes de servicios, permitiendo que las subclases redefinan ciertos pasos del algoritmo sin cambiar su estructura. El template method (`generateReport`) ejecuta una secuencia fija de pasos donde algunos son implementados en la clase abstracta y otros son delegados a las subclases concretas.
-
-**Pasos del Algoritmo** (Template Method):
-1. **Validar datos** - Implementación por defecto, puede ser sobrescrita
-2. **Preparar y filtrar datos** - Implementación por defecto con soporte de filtros
-3. **Calcular estadísticas** - Implementación común (raramente sobrescrita)
-4. **Formatear encabezado** - ⚠️ Método abstracto (debe implementarse)
-5. **Formatear contenido** - ⚠️ Método abstracto (debe implementarse)
-6. **Formatear pie de página** - Implementación por defecto, puede personalizarse
-7. **Generar archivo final** - ⚠️ Método abstracto (debe implementarse)
-8. **Post-generación** - Hook opcional para lógica adicional
-
-**Generadores Implementados:**
-- **JsonReportGenerator**: Genera reportes en formato JSON con estructura completa
-- **CsvReportGenerator**: Genera reportes tabulares en formato CSV
-- **HtmlReportGenerator**: Genera reportes web con estilos responsive
-
-**Componentes:**
-- **AbstractReportGenerator**: Clase abstracta base que define el template method
-- **ReportGenerationService**: Servicio que gestiona los diferentes generadores
-- **IReportData/IReportResult**: Interfaces para datos de entrada y salida
-
-**Funcionalidades:**
 ```typescript
 // Generar reporte en formato específico
 const reporteJSON = await reportService.generateReport(
   ReportFormat.JSON,
   new Date('2024-01-01'),
   new Date('2024-01-31'),
-  { estado: 'entregado' }
+  { estado: 'entregado' },
 );
 
 // Generar múltiples formatos simultáneamente
 const reportes = await reportService.generateMultipleFormats(
   [ReportFormat.JSON, ReportFormat.CSV, ReportFormat.EXCEL],
   fechaInicio,
-  fechaFin
+  fechaFin,
 );
 
 // Obtener formatos disponibles
@@ -409,6 +354,7 @@ const formatos = reportService.getAvailableFormats();
 ```
 
 **Ventajas del Patrón:**
+
 - ✅ Algoritmo consistente en todos los formatos
 - ✅ Código reutilizable en la clase base
 - ✅ Fácil agregar nuevos formatos (extensibilidad)
@@ -452,13 +398,6 @@ APP_PORT=3001
 ```bash
 npm run db:reset
 ```
-
-## 📖 Documentación Adicional
-
-- [Arquitectura del Sistema](docs/ARQUITECTURA.md) - Diseño, patrones y decisiones arquitectónicas
-- [Guía de Pruebas con Postman](postman/README.md) - Instrucciones paso a paso para pruebas de API
-- [Documentación de Testing](docs/TESTING.md) - Tests unitarios y patrones de diseño
-- [Documentación de API REST](docs/API-REST.md) - Endpoints y ejemplos
 
 ## Contribuir
 
